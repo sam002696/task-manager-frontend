@@ -12,9 +12,10 @@ export const authSlice = createSlice({
   initialState,
   reducers: {
     loginSuccess: (state, { payload }) => {
-      state.user = payload.user;
-      state.token = payload.token;
-      localStorage.setItem("token", payload.token); //  Store token for persistence
+      console.log(payload);
+      state.user = payload?.data?.user;
+      state.token = payload?.data?.token;
+      localStorage.setItem("user", JSON.stringify(payload?.data));
     },
     logout: (state) => {
       state.user = null;

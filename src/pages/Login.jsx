@@ -1,14 +1,31 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
-import { useDispatch } from 'react-redux';
-import { callApi } from '../store/apiSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { callApi, selectApi } from '../store/apiSlice';
 import { AUTH_API } from '../constants/apiConstants';
+import { Link, useNavigate } from 'react-router';
+import { AuthUser } from '../helpers/AuthUser';
 
 const Login = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const {
+      loading,
+      loginInfo = {
+        data: {},
+      },
+    } = useSelector(selectApi);
+
+    useEffect(() => {
+      if (loginInfo?.status === "success" && loginInfo?.data?.token)
+     {
+        AuthUser.saveLoginData(loginInfo?.data);
+        navigate("/taskboard");
+      }
+    }, [loginInfo?.data?.token,loginInfo?.data,loginInfo?.status, navigate]);
 
 
     const formik = useFormik({
@@ -27,11 +44,10 @@ const Login = () => {
                   operationId: AUTH_API.LOGIN,
                   parameters: {
                     method: "POST",
-                    body: JSON.stringify(values),
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
+                    body: JSON.stringify(values),                  
                   },
+                  output: "loginInfo",
+                  storeName: "loginInfo",
                 })
               );
         },
@@ -78,13 +94,13 @@ const Login = () => {
 
             <div className="flex items-center justify-end">
               <div className="text-sm">
-                <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
+                <Link to="/register" className="font-semibold text-indigo-600 hover:text-indigo-500">
                   New user? Register here
-                </a>
+                </Link>
               </div>
             </div>
 
-            <Button type="submit" variant="primary">Sign in</Button>
+            <Button type="submit" variant="primary" isLoading={loading}>Sign in</Button>
           </form>
 
            
