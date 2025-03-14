@@ -1,4 +1,6 @@
-export const API_BASE_URL = "https://api.example.com";
+import { UrlBuilder } from "../helpers/UrlBuilder";
+
+export const API_BASE_URL = UrlBuilder.taskManagerApi();
 
 export const AUTH_API = {
   LOGIN: `${API_BASE_URL}/login`,

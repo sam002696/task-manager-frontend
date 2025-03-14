@@ -18,13 +18,16 @@ const fetcher = async (url, options = {}) => {
     headers = { Authorization: "Bearer " + Cookies.get("access_token") };
   }
 
-  try {
-    const response = await fetch(url, { headers, ...options });
-    if (!response.ok) throw new Error(response.statusText);
-    return await response.json();
-  } catch (error) {
-    throw new Error(error.message || "Network Error");
+  const response = await fetch(url, { headers, ...options });
+
+  const data = await response.json();
+  if (!response.ok) {
+    const error = new Error(data.message || "API Request Failed");
+    error.response = data;
+    throw error;
   }
+
+  return data;
 };
 
 export default fetcher;

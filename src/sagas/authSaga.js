@@ -1,36 +1,27 @@
 import { call, put, takeEvery } from "redux-saga/effects";
-import { callApi, succeed, failed } from "../store/apiSlice";
-import { loginSuccess, logout } from "../store/authSlice";
+import { logout } from "../store/authSlice";
 import { AUTH_API } from "../constants/apiConstants";
 import fetcher from "../api/fetcher";
-
-function* handleAuth(action) {
-  const { operationId, parameters } = action.payload;
-
-  try {
-    yield put(callApi({ operationId, parameters }));
-    const response = yield call(() => fetcher(operationId, parameters));
-
-    yield put(succeed({ response, output: operationId }));
-
-    if (operationId === AUTH_API.LOGIN) {
-      yield put(loginSuccess(response));
-    }
-  } catch (error) {
-    yield put(failed({ error: error.message }));
-  }
-}
+import { setToastAlert } from "../store/errorSlice";
 
 function* handleLogout() {
   try {
     yield call(() => fetcher(AUTH_API.LOGOUT, { method: "POST" }));
     yield put(logout());
+    yield put(
+      setToastAlert({ type: "success", message: "Logged out successfully" })
+    );
   } catch (error) {
-    console.error("Logout failed:", error);
+    yield put(
+      setToastAlert({
+        type: "error",
+        message: error.message || "Something went wrong",
+      })
+    );
   }
 }
 
+//  Only listen for logout actions
 export default function* authSaga() {
-  yield takeEvery(callApi.type, handleAuth);
   yield takeEvery(logout.type, handleLogout);
 }

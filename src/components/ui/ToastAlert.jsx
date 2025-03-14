@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { selectToastAlert, clearToastAlert } from "../../store/toastAlertSlice";
+import { selectToastAlert, clearToastAlert } from "../../store/errorSlice";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
