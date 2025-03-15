@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import {
   PaperClipIcon,
   ChatBubbleBottomCenterTextIcon,
+  TrashIcon,
 } from "@heroicons/react/24/outline";
 import { useDispatch } from "react-redux";
 import InputSelect from "../ui/InputSelect";
 import Input from "../ui/Input";
+import DeleteTaskModal from "./DeleteTaskModal";
 
 const TaskCard = ({ id, name, description, status }) => {
   const dispatch = useDispatch();
@@ -17,6 +19,8 @@ const TaskCard = ({ id, name, description, status }) => {
     status: false,
   });
   const [editedTask, setEditedTask] = useState({ name, description, status });
+  const [isHovered, setIsHovered] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   // Handling field edit
   const handleEdit = (field) => {
@@ -52,7 +56,12 @@ const TaskCard = ({ id, name, description, status }) => {
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md border-l-4 flex justify-between items-center hover:bg-gray-100 cursor-pointer">
+    <div
+      className="bg-white p-4 rounded-lg shadow-md border-l-4 flex justify-between items-center hover:bg-gray-100 
+    cursor-pointer"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <div>
         {/* Editable Task name */}
         {isEditing.name ? (
@@ -123,6 +132,26 @@ const TaskCard = ({ id, name, description, status }) => {
           <PaperClipIcon className="h-4 w-4" />
         </div>
       </div>
+
+      {/* Delete Icon (Show on Hover) */}
+      {isHovered && (
+        <button
+          onClick={() => setIsDeleteModalOpen(true)}
+          className="text-gray-500 hover:text-red-600 cursor-pointer"
+        >
+          <TrashIcon className="h-5 w-5" />
+        </button>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteModalOpen && (
+        <DeleteTaskModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          taskId={id}
+          taskName={name}
+        />
+      )}
     </div>
   );
 };
