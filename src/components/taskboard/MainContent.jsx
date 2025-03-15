@@ -3,43 +3,18 @@ import Column from "./Column";
 import Button from "../ui/Button";
 import AddTaskModal from "../tasks/AddTaskModal";
 import { useDispatch, useSelector } from "react-redux";
-import { callApi, selectApi } from "../../store/apiSlice";
 import { TASK_API } from "../../constants/apiConstants";
-import { addTaskLocal, setTasks } from "../../store/taskSlice";
 
 const TaskBoard = () => {
   const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { tasks } = useSelector((state) => state.tasks);
-  const {
-    taskList = {
-      data: {},
-    },
-  } = useSelector(selectApi);
+  const tasks = useSelector((state) => state.tasks.tasks);
 
-  // Fetch tasks on component mount
   useEffect(() => {
-    dispatch(callApi({ operationId: TASK_API.FETCH, output: "taskList" }));
-  }, [dispatch]);
-
-  // Adding task response handler
-  useEffect(() => {
-    if (taskList?.status === "success" && Array.isArray(taskList?.data)) {
-      dispatch(setTasks(taskList.data));
+    if (tasks.length === 0) {
+      dispatch({ type: TASK_API.FETCH });
     }
-  }, [taskList, dispatch]);
-
-  // Add a new task without duplicates
-  useEffect(() => {
-    if (
-      taskList?.status === "success" &&
-      taskList?.data &&
-      !Array.isArray(taskList.data)
-    ) {
-      dispatch(addTaskLocal(taskList.data)); // Uses slice logic to prevent duplicates
-      setIsModalOpen(false);
-    }
-  }, [taskList, dispatch]);
+  }, [dispatch, tasks.length]);
 
   const groupedTasks = {
     "To Do": tasks?.filter((task) => task.status === "To Do") || [],

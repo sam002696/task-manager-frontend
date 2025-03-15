@@ -1,16 +1,14 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import Modal from "../ui/Modal";
 import Input from "../ui/Input";
 import InputSelect from "../ui/InputSelect";
-import { callApi, selectApi } from "../../store/apiSlice";
 import { TASK_API } from "../../constants/apiConstants";
 
 const AddTaskModal = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
-  const { taskResponse = { data: {} } } = useSelector(selectApi);
 
   const formik = useFormik({
     initialValues: {
@@ -26,27 +24,18 @@ const AddTaskModal = ({ isOpen, onClose }) => {
       due_date: Yup.string().required("Due date is required"),
     }),
     onSubmit: (values) => {
-      console.log("Submitting Task:", values);
-
-      dispatch(
-        callApi({
-          operationId: TASK_API.CREATE,
-          parameters: {
-            method: "POST",
-            body: JSON.stringify(values),
+      dispatch({
+        type: TASK_API.CREATE,
+        payload: {
+          taskData: values,
+          onSuccess: () => {
+            formik.resetForm();
+            onClose();
           },
-          output: "taskResponse",
-        })
-      );
+        },
+      });
     },
   });
-
-  // closing modal on successful task creation
-  useEffect(() => {
-    if (taskResponse.status === "success") {
-      onClose();
-    }
-  }, [taskResponse, onClose]);
 
   return (
     <Modal
