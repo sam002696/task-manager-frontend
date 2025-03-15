@@ -9,15 +9,15 @@ const Taskboard = () => {
 
   return (
     <div className="flex">
-      {/* ✅ Sidebar */}
+      {/*  Sidebar */}
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
-      {/* ✅ Main Layout */}
+      {/*  Main Layout */}
       <div className="flex flex-col flex-1 lg:pl-20">
-        {/* ✅ Top Bar */}
+        {/*  Top Bar */}
         <Topbar setSidebarOpen={setSidebarOpen} />
 
-        {/* ✅ Main Content */}
+        {/*  Main Content */}
         <MainContent />
       </div>
     </div>

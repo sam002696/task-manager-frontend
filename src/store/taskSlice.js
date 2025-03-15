@@ -10,11 +10,16 @@ export const taskSlice = createSlice({
       state.tasks = payload;
     },
     addTaskLocal: (state, { payload }) => {
-      state.tasks.push(payload);
+      const isDuplicate = state.tasks.some((task) => task.id === payload.id);
+      if (!isDuplicate) {
+        state.tasks.push(payload);
+      }
     },
     updateTaskLocal: (state, { payload }) => {
       const index = state.tasks.findIndex((task) => task.id === payload.id);
-      if (index !== -1) state.tasks[index] = payload;
+      if (index !== -1) {
+        state.tasks[index] = payload;
+      }
     },
     deleteTaskLocal: (state, { payload }) => {
       state.tasks = state.tasks.filter((task) => task.id !== payload);
