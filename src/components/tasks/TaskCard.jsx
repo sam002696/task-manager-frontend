@@ -5,6 +5,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { useDispatch } from "react-redux";
 import InputSelect from "../ui/InputSelect";
+import Input from "../ui/Input";
 
 const TaskCard = ({ id, name, description, status }) => {
   const dispatch = useDispatch();
@@ -51,19 +52,18 @@ const TaskCard = ({ id, name, description, status }) => {
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md border-l-4 flex justify-between items-center">
+    <div className="bg-white p-4 rounded-lg shadow-md border-l-4 flex justify-between items-center hover:bg-gray-100 cursor-pointer">
       <div>
         {/* Editable Task name */}
         {isEditing.name ? (
-          <input
+          <Input
             type="text"
             name="name"
             value={editedTask.name}
             onChange={handleChange}
             onBlur={() => handleUpdate("name")}
             onKeyDown={(e) => e.key === "Enter" && handleUpdate("name")}
-            className="border p-1 w-full"
-            autoFocus
+            autoFocus={true}
           />
         ) : (
           <p
@@ -76,15 +76,14 @@ const TaskCard = ({ id, name, description, status }) => {
 
         {/* Editable Task Description */}
         {isEditing.description ? (
-          <input
+          <Input
             type="text"
             name="description"
             value={editedTask.description}
             onChange={handleChange}
             onBlur={() => handleUpdate("description")}
             onKeyDown={(e) => e.key === "Enter" && handleUpdate("description")}
-            className="border p-1 w-full mt-1 text-sm"
-            autoFocus
+            autoFocus={true}
           />
         ) : (
           <p
