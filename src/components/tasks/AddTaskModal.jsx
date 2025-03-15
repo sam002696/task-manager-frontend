@@ -5,7 +5,6 @@ import { useDispatch } from "react-redux";
 import Modal from "../ui/Modal";
 import Input from "../ui/Input";
 import InputSelect from "../ui/InputSelect";
-import { TASK_API } from "../../constants/apiConstants";
 
 const AddTaskModal = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
@@ -25,7 +24,7 @@ const AddTaskModal = ({ isOpen, onClose }) => {
     }),
     onSubmit: (values) => {
       dispatch({
-        type: TASK_API.CREATE,
+        type: "taskAdd",
         payload: {
           taskData: values,
           onSuccess: () => {

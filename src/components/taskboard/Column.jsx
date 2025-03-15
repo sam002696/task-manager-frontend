@@ -5,7 +5,7 @@ const Column = ({ title, tasks }) => {
   const columnStyles = {
     "To Do": "border-purple-400",
     "In Progress": "border-blue-400",
-    Completed: "border-green-400",
+    Done: "border-green-400",
   };
 
   return (
@@ -20,8 +20,10 @@ const Column = ({ title, tasks }) => {
         {tasks.map((task) => (
           <TaskCard
             key={task.id}
-            title={task.name}
+            id={task.id}
+            name={task.name}
             description={task.description}
+            status={task.status}
           />
         ))}
       </div>

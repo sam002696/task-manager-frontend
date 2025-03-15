@@ -18,7 +18,7 @@ export const taskSlice = createSlice({
     updateTaskLocal: (state, { payload }) => {
       const index = state.tasks.findIndex((task) => task.id === payload.id);
       if (index !== -1) {
-        state.tasks[index] = payload;
+        state.tasks[index] = { ...state.tasks[index], ...payload };
       }
     },
     deleteTaskLocal: (state, { payload }) => {

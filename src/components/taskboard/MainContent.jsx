@@ -3,7 +3,6 @@ import Column from "./Column";
 import Button from "../ui/Button";
 import AddTaskModal from "../tasks/AddTaskModal";
 import { useDispatch, useSelector } from "react-redux";
-import { TASK_API } from "../../constants/apiConstants";
 
 const TaskBoard = () => {
   const dispatch = useDispatch();
@@ -12,7 +11,7 @@ const TaskBoard = () => {
 
   useEffect(() => {
     if (tasks.length === 0) {
-      dispatch({ type: TASK_API.FETCH });
+      dispatch({ type: "taskLists" });
     }
   }, [dispatch, tasks.length]);
 

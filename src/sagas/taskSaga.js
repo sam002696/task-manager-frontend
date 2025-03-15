@@ -1,6 +1,6 @@
 import { call, put, select, takeLatest } from "redux-saga/effects";
 import { succeed, failed } from "../store/apiSlice";
-import { setTasks, addTaskLocal } from "../store/taskSlice";
+import { setTasks, addTaskLocal, updateTaskLocal } from "../store/taskSlice";
 import { TASK_API } from "../constants/apiConstants";
 import fetcher from "../api/fetcher";
 import { setToastAlert } from "../store/errorSlice";
@@ -59,22 +59,61 @@ function* addTask(action) {
 
     throw new Error("Invalid API response. Task data is missing.");
   } catch (error) {
-    console.error("❌ Error in Task Creation:", error?.response?.message);
+    const errorMessage = error?.response?.message;
 
-    // const errorMessage = error?.response?.message;
+    yield put(failed({ error: errorMessage }));
+    yield put(
+      setToastAlert({
+        type: "error",
+        message: errorMessage || " Something went wrong",
+      })
+    );
+  }
+}
 
-    // yield put(failed({ error: errorMessage }));
-    // yield put(
-    //   setToastAlert({
-    //     type: "error",
-    //     message: errorMessage || " Something went wrong",
-    //   })
-    // );
+function* updateTask(action) {
+  let previousTasks = [];
+
+  try {
+    const { taskId, taskData } = action.payload;
+
+    previousTasks = yield select((state) => state.tasks.tasks); //  Save old state
+
+    // Optimistically updating UI
+    yield put(updateTaskLocal({ id: taskId, ...taskData }));
+
+    //  Ensuring function is called with `taskId`
+    const response = yield call(() =>
+      fetcher(TASK_API.UPDATE(taskId), {
+        method: "PUT",
+        body: JSON.stringify(taskData),
+      })
+    );
+
+    if (!response?.data) {
+      throw new Error("Invalid API response.");
+    }
+
+    yield put(succeed({ response, output: TASK_API.UPDATE(taskId) }));
+    yield put(
+      setToastAlert({ type: "success", message: "Task updated successfully!" })
+    );
+  } catch (error) {
+    yield put(failed({ error: error.message }));
+
+    if (previousTasks.length > 0) {
+      yield put(setTasks(previousTasks));
+    }
+
+    yield put(
+      setToastAlert({ type: "error", message: "Failed to update task." })
+    );
   }
 }
 
 //  Saga Watcher
 export default function* taskSaga() {
-  yield takeLatest(TASK_API.FETCH, fetchTasks);
-  yield takeLatest(TASK_API.CREATE, addTask);
+  yield takeLatest("taskLists", fetchTasks);
+  yield takeLatest("taskAdd", addTask);
+  yield takeLatest("updateTask", updateTask);
 }
