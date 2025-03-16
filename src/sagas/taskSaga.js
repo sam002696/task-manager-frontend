@@ -10,17 +10,17 @@ import { TASK_API } from "../constants/apiConstants";
 import fetcher from "../api/fetcher";
 import { setToastAlert } from "../store/errorSlice";
 
-function* fetchTasks(action) {
+function* fetchTasks() {
   try {
-    const { status, sort } = action.payload || {};
+    const filters = yield select((state) => state.tasks.filters); // Getting filters from Redux
 
     let queryParams = new URLSearchParams();
 
-    if (status) queryParams.append("status", status);
-    if (sort === "newest") {
-      queryParams.append("sort", "desc"); // Sorting by newest
-    } else if (sort === "oldest") {
-      queryParams.append("sort", "asc"); // Sorting by oldest
+    if (filters.status !== "All") queryParams.append("status", filters.status);
+    if (filters.sort === "newest") {
+      queryParams.append("sort", "desc");
+    } else if (filters.sort === "oldest") {
+      queryParams.append("sort", "asc");
     }
 
     const response = yield call(() =>
@@ -31,7 +31,7 @@ function* fetchTasks(action) {
       yield put(setTasks(response.data));
     }
 
-    yield put(succeed({ response, output: TASK_API.FETCH }));
+    yield put(succeed({ response, output: "taskLists" }));
   } catch (error) {
     yield put(failed({ error: error.message }));
   }

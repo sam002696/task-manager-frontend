@@ -4,27 +4,19 @@ import Button from "../ui/Button";
 import AddTaskModal from "../tasks/AddTaskModal";
 import { useDispatch, useSelector } from "react-redux";
 import InputSelect from "../ui/InputSelect";
+import { setFilters } from "../../store/taskSlice";
 
-const TaskBoard = () => {
+const MainContent = () => {
   const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const tasks = useSelector((state) => state.tasks.tasks);
-
-  const [filterStatus, setFilterStatus] = useState(""); // Default: Show All
-  const [sortOrder, setSortOrder] = useState("newest"); // Default: Newest First
+  const filters = useSelector((state) => state.tasks.filters);
 
   useEffect(() => {
     dispatch({
       type: "taskLists",
-      payload: { status: filterStatus, sort: sortOrder },
     });
-  }, [dispatch, filterStatus, sortOrder]);
-
-  const groupedTasks = {
-    "To Do": tasks?.filter((task) => task.status === "To Do") || [],
-    "In Progress": tasks?.filter((task) => task.status === "In Progress") || [],
-    Done: tasks?.filter((task) => task.status === "Done") || [],
-  };
+  }, [dispatch, filters]);
 
   return (
     <main className="px-4 py-10 sm:px-6 lg:px-8 lg:py-6">
@@ -39,8 +31,10 @@ const TaskBoard = () => {
           {/* Filter By Status */}
           <InputSelect
             name="filterStatus"
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
+            value={filters.status}
+            onChange={(e) =>
+              dispatch(setFilters({ ...filters, status: e.target.value }))
+            }
             options={[
               { value: "", label: "All" },
               { value: "To Do", label: "To Do" },
@@ -52,8 +46,10 @@ const TaskBoard = () => {
           {/* Sort By Due Date */}
           <InputSelect
             name="sortOrder"
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
+            value={filters.sort}
+            onChange={(e) =>
+              dispatch(setFilters({ ...filters, sort: e.target.value }))
+            }
             options={[
               { value: "newest", label: "Newest First" },
               { value: "oldest", label: "Oldest First" },
@@ -74,8 +70,12 @@ const TaskBoard = () => {
 
       {/* Task Columns */}
       <div className="grid grid-cols-3 gap-6">
-        {Object.entries(groupedTasks).map(([title, tasks]) => (
-          <Column key={title} title={title} tasks={tasks} />
+        {["To Do", "In Progress", "Done"].map((status) => (
+          <Column
+            key={status}
+            title={status}
+            tasks={tasks.filter((task) => task.status === status)}
+          />
         ))}
       </div>
 
@@ -90,4 +90,4 @@ const TaskBoard = () => {
   );
 };
 
-export default TaskBoard;
+export default MainContent;
