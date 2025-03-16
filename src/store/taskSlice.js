@@ -7,7 +7,9 @@ export const taskSlice = createSlice({
   initialState,
   reducers: {
     setTasks: (state, { payload }) => {
-      state.tasks = payload;
+      state.tasks = payload.sort(
+        (a, b) => new Date(b.due_date) - new Date(a.due_date)
+      );
     },
     addTaskLocal: (state, { payload }) => {
       const isDuplicate = state.tasks.some((task) => task.id === payload.id);

@@ -10,9 +10,22 @@ import { TASK_API } from "../constants/apiConstants";
 import fetcher from "../api/fetcher";
 import { setToastAlert } from "../store/errorSlice";
 
-function* fetchTasks() {
+function* fetchTasks(action) {
   try {
-    const response = yield call(() => fetcher(TASK_API.FETCH));
+    const { status, sort } = action.payload || {};
+
+    let queryParams = new URLSearchParams();
+
+    if (status) queryParams.append("status", status);
+    if (sort === "newest") {
+      queryParams.append("sort", "desc"); // Sorting by newest
+    } else if (sort === "oldest") {
+      queryParams.append("sort", "asc"); // Sorting by oldest
+    }
+
+    const response = yield call(() =>
+      fetcher(`${TASK_API.FETCH}?${queryParams}`)
+    );
 
     if (response?.data) {
       yield put(setTasks(response.data));
