@@ -18,7 +18,7 @@ const MainContent = () => {
     dispatch({
       type: "taskLists",
     });
-  }, [dispatch, filters]);
+  }, [dispatch, filters.status, filters.sort]);
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
