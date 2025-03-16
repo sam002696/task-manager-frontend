@@ -5,18 +5,25 @@ import AddTaskModal from "../tasks/AddTaskModal";
 import { useDispatch, useSelector } from "react-redux";
 import InputSelect from "../ui/InputSelect";
 import { setFilters } from "../../store/taskSlice";
+import Input from "../ui/Input";
 
 const MainContent = () => {
+  const filters = useSelector((state) => state.tasks.filters);
   const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const tasks = useSelector((state) => state.tasks.tasks);
-  const filters = useSelector((state) => state.tasks.filters);
+  const [searchTerm, setSearchTerm] = useState(filters.search || "");
 
   useEffect(() => {
     dispatch({
       type: "taskLists",
     });
   }, [dispatch, filters]);
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    dispatch({ type: "searchTasks", payload: e.target.value });
+  };
 
   return (
     <main className="px-4 py-10 sm:px-6 lg:px-8 lg:py-6">
@@ -28,6 +35,14 @@ const MainContent = () => {
 
         {/*  Sorting & Filtering Controls */}
         <div className="flex gap-4">
+          {/*  Search Bar */}
+          <Input
+            type="text"
+            placeholder="Search tasks..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
+
           {/* Filter By Status */}
           <InputSelect
             name="filterStatus"

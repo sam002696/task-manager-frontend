@@ -4,7 +4,7 @@ const initialState = {
   tasks: [],
   loading: false,
   error: null,
-  filters: { status: "All", sort: "newest" },
+  filters: { status: "All", sort: "newest", search: "" },
 };
 
 export const taskSlice = createSlice({
@@ -72,7 +72,7 @@ export const taskSlice = createSlice({
       state.tasks = state.tasks.filter((task) => task.id !== payload);
     },
     setFilters: (state, { payload }) => {
-      state.filters = payload;
+      state.filters = { ...state.filters, ...payload };
     },
   },
 });

@@ -1,10 +1,11 @@
-import { call, put, select, takeLatest } from "redux-saga/effects";
+import { call, put, select, takeLatest, debounce } from "redux-saga/effects";
 import { succeed, failed } from "../store/apiSlice";
 import {
   setTasks,
   addTaskLocal,
   updateTaskLocal,
   deleteTaskLocal,
+  setFilters,
 } from "../store/taskSlice";
 import { TASK_API } from "../constants/apiConstants";
 import fetcher from "../api/fetcher";
@@ -22,6 +23,8 @@ function* fetchTasks() {
     } else if (filters.sort === "oldest") {
       queryParams.append("sort", "asc");
     }
+
+    if (filters.search) queryParams.append("search", filters.search);
 
     const response = yield call(() =>
       fetcher(`${TASK_API.FETCH}?${queryParams}`)
@@ -163,10 +166,19 @@ function* deleteTask(action) {
   }
 }
 
+// Debounced Search
+function* handleSearchTasks(action) {
+  const currentFilters = yield select((state) => state.tasks.filters);
+
+  yield put(setFilters({ ...currentFilters, search: action.payload }));
+  yield call(fetchTasks);
+}
+
 //  Saga Watcher
 export default function* taskSaga() {
   yield takeLatest("taskLists", fetchTasks);
   yield takeLatest("taskAdd", addTask);
   yield takeLatest("updateTask", updateTask);
   yield takeLatest("deleteTask", deleteTask);
+  yield debounce(500, "searchTasks", handleSearchTasks);
 }
