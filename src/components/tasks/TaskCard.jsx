@@ -70,22 +70,11 @@ const TaskCard = ({ id, name, description, status }) => {
   return (
     <div
       ref={setNodeRef}
-      className="bg-white p-4 rounded-lg shadow-md border-l-4 flex justify-between items-center hover:bg-gray-100 
-    cursor-pointer"
+      className="bg-white p-4 rounded-lg shadow-md border-l-4 flex justify-between items-center hover:bg-gray-100"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={style}
     >
-      {!isAnyFieldEditing && (
-        <div
-          {...listeners}
-          {...attributes}
-          className="cursor-grab active:cursor-grabbing pr-2"
-        >
-          <PaperClipIcon className="h-5 w-5 text-gray-500" />
-        </div>
-      )}
-
       <div className="flex-1">
         {/* Editable Task Name */}
         {isEditing.name ? (
@@ -160,7 +149,7 @@ const TaskCard = ({ id, name, description, status }) => {
       {isHovered && (
         <button
           onClick={() => setIsDeleteModalOpen(true)}
-          className="text-gray-500 hover:text-red-600 cursor-pointer"
+          className="text-gray-500 hover:text-red-600 cursor-pointer mr-3"
         >
           <TrashIcon className="h-5 w-5" />
         </button>
@@ -174,6 +163,16 @@ const TaskCard = ({ id, name, description, status }) => {
           taskId={id}
           taskName={name}
         />
+      )}
+
+      {!isAnyFieldEditing && (
+        <div
+          {...listeners}
+          {...attributes}
+          className="cursor-grab active:cursor-grabbing pr-2"
+        >
+          <PaperClipIcon className="h-5 w-5 text-gray-500" />
+        </div>
       )}
     </div>
   );

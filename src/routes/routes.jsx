@@ -1,48 +1,30 @@
 import { lazy, Suspense } from "react";
-// import PrivateRoute from "./PrivateRoute";
 import { Navigate } from "react-router";
 import Loader from "../components/ui/Loader";
 
-// const Home = lazy(() => import("../pages/Home"));
 const Login = lazy(() => import("../pages/Login"));
 const Register = lazy(() => import("../pages/Register"));
 const Taskboard = lazy(() => import("../pages/Taskboard"));
-// const NotFound = lazy(() => import("../pages/NotFound"));
+const NotFound = lazy(() => import("../pages/NotFound"));
 
 const routes = [
   { path: "/", element: <Navigate to="/login" replace /> },
   {
     path: "/login",
-    element: (
-      <Suspense fallback={<Loader />}>
-        <Login />
-      </Suspense>
-    ),
+    element: <Login />,
   },
   {
     path: "/register",
-    element: (
-      <Suspense fallback={<Loader />}>
-        <Register />
-      </Suspense>
-    ),
+    element: <Register />,
   },
   {
     path: "/taskboard",
-    element: (
-      <Suspense fallback={<Loader />}>
-        <Taskboard />
-      </Suspense>
-    ),
+    element: <Taskboard />,
   },
-  // {
-  //   path: "*",
-  //   element: (
-  //     <Suspense fallback={<Loader />}>
-  //       <NotFound />
-  //     </Suspense>
-  //   ),
-  // },
+  {
+    path: "*",
+    element: <NotFound />,
+  },
 ];
 
 export default routes;
