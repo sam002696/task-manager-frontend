@@ -1,5 +1,6 @@
 import React from "react";
 import TaskCard from "../tasks/TaskCard";
+import { useDroppable } from "@dnd-kit/core";
 
 const Column = ({ title, tasks }) => {
   const columnStyles = {
@@ -8,8 +9,13 @@ const Column = ({ title, tasks }) => {
     Done: "border-green-400",
   };
 
+  const { setNodeRef } = useDroppable({
+    id: title,
+  });
+
   return (
     <div
+      ref={setNodeRef}
       className={`bg-white rounded-lg shadow-md p-4 border-t-4 ${columnStyles[title]}`}
     >
       {/* Column Header */}

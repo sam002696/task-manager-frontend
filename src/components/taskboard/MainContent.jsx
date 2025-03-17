@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Column from "./Column";
 import Button from "../ui/Button";
+import { DndContext } from "@dnd-kit/core";
 import AddTaskModal from "../tasks/AddTaskModal";
 import { useDispatch, useSelector } from "react-redux";
 import InputSelect from "../ui/InputSelect";
@@ -25,83 +26,103 @@ const MainContent = () => {
     dispatch({ type: "searchTasks", payload: e.target.value });
   };
 
+  // Handle Drag & Drop
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+
+    if (!over) return;
+
+    const taskId = active.id;
+    const newStatus = over.id; // The column where the task is dropped
+
+    dispatch({
+      type: "updateTask",
+      payload: {
+        taskId,
+        taskData: { status: newStatus },
+      },
+    });
+  };
+
   return (
-    <main className="px-4 py-10 sm:px-6 lg:px-8 lg:py-6">
-      {/* Header Section */}
-      <div className="flex justify-between items-center mb-10">
-        <div>
-          <p className="text-2xl font-bold text-gray-900">Studio board</p>
+    <DndContext onDragEnd={handleDragEnd}>
+      <main className="px-4 py-10 sm:px-6 lg:px-8 lg:py-6">
+        {/* Header Section */}
+        <div className="flex justify-between items-center mb-10">
+          <div>
+            <p className="text-2xl font-bold text-gray-900">Studio board</p>
+          </div>
+
+          {/*  Sorting & Filtering Controls */}
+          <div className="flex gap-4">
+            {/*  Search Bar */}
+            <Input
+              type="text"
+              placeholder="Search tasks..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+
+            {/* Filter By Status */}
+            <InputSelect
+              name="filterStatus"
+              value={filters.status}
+              onChange={(e) =>
+                dispatch(setFilters({ ...filters, status: e.target.value }))
+              }
+              options={[
+                { value: "", label: "All" },
+                { value: "To Do", label: "To Do" },
+                { value: "In Progress", label: "In Progress" },
+                { value: "Done", label: "Done" },
+              ]}
+            />
+
+            {/* Sort By Due Date */}
+            <InputSelect
+              name="sortOrder"
+              value={filters.sort}
+              onChange={(e) =>
+                dispatch(setFilters({ ...filters, sort: e.target.value }))
+              }
+              options={[
+                { value: "newest", label: "Newest First" },
+                { value: "oldest", label: "Oldest First" },
+              ]}
+            />
+          </div>
+
+          <div>
+            <Button
+              type="submit"
+              variant="primary"
+              onClick={() => setIsModalOpen(true)}
+            >
+              Add task
+            </Button>
+          </div>
         </div>
 
-        {/*  Sorting & Filtering Controls */}
-        <div className="flex gap-4">
-          {/*  Search Bar */}
-          <Input
-            type="text"
-            placeholder="Search tasks..."
-            value={searchTerm}
-            onChange={handleSearchChange}
-          />
-
-          {/* Filter By Status */}
-          <InputSelect
-            name="filterStatus"
-            value={filters.status}
-            onChange={(e) =>
-              dispatch(setFilters({ ...filters, status: e.target.value }))
-            }
-            options={[
-              { value: "", label: "All" },
-              { value: "To Do", label: "To Do" },
-              { value: "In Progress", label: "In Progress" },
-              { value: "Done", label: "Done" },
-            ]}
-          />
-
-          {/* Sort By Due Date */}
-          <InputSelect
-            name="sortOrder"
-            value={filters.sort}
-            onChange={(e) =>
-              dispatch(setFilters({ ...filters, sort: e.target.value }))
-            }
-            options={[
-              { value: "newest", label: "Newest First" },
-              { value: "oldest", label: "Oldest First" },
-            ]}
-          />
+        {/* Task Columns */}
+        <div className="grid grid-cols-3 gap-6">
+          {["To Do", "In Progress", "Done"].map((status) => (
+            <Column
+              key={status}
+              title={status}
+              tasks={tasks.filter((task) => task.status === status)}
+            />
+          ))}
         </div>
 
-        <div>
-          <Button
-            type="submit"
-            variant="primary"
-            onClick={() => setIsModalOpen(true)}
-          >
-            Add task
-          </Button>
-        </div>
-      </div>
-
-      {/* Task Columns */}
-      <div className="grid grid-cols-3 gap-6">
-        {["To Do", "In Progress", "Done"].map((status) => (
-          <Column
-            key={status}
-            title={status}
-            tasks={tasks.filter((task) => task.status === status)}
+        {/* Task Modal */}
+        {isModalOpen && (
+          <AddTaskModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
           />
-        ))}
-      </div>
-
-      {/* Task Modal */}
-      {isModalOpen && (
-        <AddTaskModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-        />
-      )}
-    </main>
+        )}
+      </main>
+    </DndContext>
   );
 };
 

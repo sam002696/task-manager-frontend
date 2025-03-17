@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useDraggable } from "@dnd-kit/core";
 import {
   PaperClipIcon,
   ChatBubbleBottomCenterTextIcon,
@@ -10,17 +11,24 @@ import Input from "../ui/Input";
 import DeleteTaskModal from "./DeleteTaskModal";
 
 const TaskCard = ({ id, name, description, status }) => {
-  const dispatch = useDispatch();
-
   // State for inline editing
   const [isEditing, setIsEditing] = useState({
     name: false,
     description: false,
     status: false,
   });
+
   const [editedTask, setEditedTask] = useState({ name, description, status });
   const [isHovered, setIsHovered] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const isAnyFieldEditing = Object.values(isEditing).some((value) => value);
+
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id,
+    disabled: isAnyFieldEditing,
+  });
+  const dispatch = useDispatch();
 
   // Handling field edit
   const handleEdit = (field) => {
@@ -55,15 +63,31 @@ const TaskCard = ({ id, name, description, status }) => {
     });
   };
 
+  const style = transform
+    ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` }
+    : undefined;
+
   return (
     <div
+      ref={setNodeRef}
       className="bg-white p-4 rounded-lg shadow-md border-l-4 flex justify-between items-center hover:bg-gray-100 
     cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      style={style}
     >
-      <div>
-        {/* Editable Task name */}
+      {!isAnyFieldEditing && (
+        <div
+          {...listeners}
+          {...attributes}
+          className="cursor-grab active:cursor-grabbing pr-2"
+        >
+          <PaperClipIcon className="h-5 w-5 text-gray-500" />
+        </div>
+      )}
+
+      <div className="flex-1">
+        {/* Editable Task Name */}
         {isEditing.name ? (
           <Input
             type="text"
@@ -129,7 +153,6 @@ const TaskCard = ({ id, name, description, status }) => {
         {/* Icons */}
         <div className="flex items-center gap-3 mt-2 text-gray-500">
           <ChatBubbleBottomCenterTextIcon className="h-4 w-4" />
-          <PaperClipIcon className="h-4 w-4" />
         </div>
       </div>
 

@@ -31,6 +31,7 @@ const Input = ({
             : "border-gray-300 focus:ring-indigo-600"
         } placeholder:text-gray-400 focus:outline-none focus:ring-2 sm:text-sm`}
         autoFocus={autofocus}
+        data-dndkit-disable-drag
       />
       {error && <span className="text-red-500 text-sm mt-1">{error}</span>}
     </div>
