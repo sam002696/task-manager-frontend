@@ -12,8 +12,12 @@ const App = () => {
       {/* <Layout> */}
       <Suspense fallback={<Loader />}>
         <Routes>
-          {routes.map(({ path, element }, index) => (
-            <Route key={index} path={path} element={element} />
+          {routes.map(({ path, element, children }, index) => (
+            <Route key={index} path={path} element={element}>
+              {children?.map(({ path, element }, subIndex) => (
+                <Route key={subIndex} path={path} element={element} />
+              ))}
+            </Route>
           ))}
         </Routes>
       </Suspense>

@@ -1,5 +1,6 @@
 import { lazy } from "react";
 import { Navigate } from "react-router";
+import PrivateRoute from "./PrivateRoute";
 
 const Login = lazy(() => import("../pages/Login"));
 const Register = lazy(() => import("../pages/Register"));
@@ -17,8 +18,9 @@ const routes = [
     element: <Register />,
   },
   {
-    path: "/taskboard",
-    element: <Taskboard />,
+    path: "/",
+    element: <PrivateRoute />,
+    children: [{ path: "taskboard", element: <Taskboard /> }],
   },
   {
     path: "*",
