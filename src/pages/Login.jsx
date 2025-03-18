@@ -8,6 +8,7 @@ import { callApi, clearState, selectApi } from "../store/apiSlice";
 import { AUTH_API } from "../constants/apiConstants";
 import { Link, useNavigate } from "react-router";
 import { AuthUser } from "../helpers/AuthUser";
+import Taskify from "../../public/images/taskify.png";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -69,11 +70,7 @@ const Login = () => {
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <img
-          alt="Your Company"
-          src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
-          className="mx-auto h-10 w-auto"
-        />
+        <img alt="Taskify" src={Taskify} className="mx-auto h-16 w-auto" />
         <h2 className="mt-6 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
           Sign in to your account
         </h2>

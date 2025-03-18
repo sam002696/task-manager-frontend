@@ -7,7 +7,7 @@ const Button = ({
   className = "",
 }) => {
   const baseStyles =
-    "flex justify-center rounded-md px-4 py-2 text-sm font-semibold shadow-xs focus-visible:outline-2 focus-visible:outline-offset-2 cursor-pointer";
+    "flex justify-center rounded-md px-4 py-2 text-sm font-semibold shadow-xs focus-visible:outline-2 focus-visible:outline-offset-2 cursor-pointer w-full";
 
   const variants = {
     primary:

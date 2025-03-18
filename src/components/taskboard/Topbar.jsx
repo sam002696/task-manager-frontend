@@ -1,6 +1,6 @@
 import React from "react";
-import { Bars3Icon, BellIcon } from "@heroicons/react/24/outline";
-import SearchBar from "./SearchBar";
+import { Bars3Icon } from "@heroicons/react/24/outline";
+// import SearchBar from "./SearchBar";
 import UserDropdown from "./UserDropdown";
 
 const Topbar = ({ setSidebarOpen }) => {
@@ -18,21 +18,11 @@ const Topbar = ({ setSidebarOpen }) => {
 
       <div aria-hidden="true" className="h-6 w-px bg-gray-900/10 lg:hidden" />
 
-      <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-        <SearchBar />
+      <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6 justify-end">
+        {/* <SearchBar /> */}
 
         <div className="flex items-center gap-x-4 lg:gap-x-6">
-          <button
-            type="button"
-            className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500"
-          >
-            <BellIcon className="size-6" />
-          </button>
-
-          <div
-            aria-hidden="true"
-            className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-900/10"
-          />
+          <div aria-hidden="true" className="hidden lg:block lg:h-6" />
 
           <UserDropdown />
         </div>
