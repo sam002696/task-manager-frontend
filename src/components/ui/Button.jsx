@@ -4,6 +4,8 @@ const Button = ({
   type = "button",
   isLoading,
   variant = "primary",
+  icon: Icon = null,
+  iconPosition = "left",
   className = "",
 }) => {
   const baseStyles =
@@ -16,6 +18,8 @@ const Button = ({
       "bg-gray-200 text-gray-900 hover:bg-gray-300 focus-visible:outline-gray-400",
     danger:
       "bg-red-500 text-white hover:bg-red-600 focus-visible:outline-red-700",
+    filter:
+      "bg-indigo-50 text-indigo-600 hover:bg-indigo-100 focus-visible:outline-indigo-600",
   };
 
   return (
@@ -27,7 +31,9 @@ const Button = ({
         isLoading ? "opacity-50 cursor-not-allowed" : ""
       } ${className}`}
     >
+      {Icon && iconPosition === "left" && <Icon className="size-5 mr-2" />}
       {isLoading ? "Loading..." : children}
+      {Icon && iconPosition === "right" && <Icon className="size-5" />}
     </button>
   );
 };

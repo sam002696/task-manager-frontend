@@ -8,6 +8,7 @@ import {
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { navigation } from "../../constants/navigation";
 import { useLocation, Link } from "react-router";
+import TaskifyLogo from "../../../public/images/taskify-logo.png";
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const location = useLocation();
@@ -69,10 +70,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
       {/*  Desktop Sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:block lg:w-20 lg:bg-gray-900">
         <div className="flex h-16 items-center justify-center">
-          <img
-            src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
-            className="h-8 w-auto"
-          />
+          <img src={TaskifyLogo} className="h-12 w-auto" />
         </div>
         <nav className="mt-8">
           <ul className="flex flex-col items-center space-y-1">

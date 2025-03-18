@@ -12,6 +12,7 @@ const initialState = {
     due_date_from: null,
     due_date_to: null,
   },
+  activeFilterCount: 2, // Default: "All" & "newest"
 };
 
 // Sorting Function
@@ -46,6 +47,27 @@ const filterTasks = (tasks, filters) => {
   return sortTasks(filteredTasks, filters.sort);
 };
 
+// Function to Calculate Active Filters
+const calculateActiveFilterCount = (filters) => {
+  const defaultFilterCount = 2; // "status" and "sort" are always set here
+
+  const additionalFilters = Object.entries(filters).filter(([key, val]) => {
+    return (
+      val &&
+      key !== "status" &&
+      key !== "sort" &&
+      key !== "due_date_from" &&
+      key !== "due_date_to"
+    );
+  }).length;
+
+  // Counting date filters as 1 only when both are set
+  const dateRangeSelected =
+    filters.due_date_from && filters.due_date_to ? 1 : 0;
+
+  return defaultFilterCount + additionalFilters + dateRangeSelected;
+};
+
 // Task Slice
 export const taskSlice = createSlice({
   name: "tasks",
@@ -77,6 +99,7 @@ export const taskSlice = createSlice({
 
     setFilters: (state, { payload }) => {
       state.filters = { ...state.filters, ...payload };
+      state.activeFilterCount = calculateActiveFilterCount(state.filters);
     },
   },
 });
