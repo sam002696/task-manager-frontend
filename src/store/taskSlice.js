@@ -22,11 +22,11 @@ export const taskSlice = createSlice({
 
       if (state.filters.sort === "newest") {
         filteredTasks.sort(
-          (a, b) => new Date(b.due_date) - new Date(a.due_date)
+          (a, b) => new Date(b.created_at) - new Date(a.created_at)
         ); // Newest First
       } else if (state.filters.sort === "oldest") {
         filteredTasks.sort(
-          (a, b) => new Date(a.due_date) - new Date(b.due_date)
+          (a, b) => new Date(a.created_at) - new Date(b.created_at)
         ); // Oldest First
       }
 
@@ -40,11 +40,11 @@ export const taskSlice = createSlice({
         // Applying sorting after adding the task
         if (state.filters.sort === "newest") {
           state.tasks.sort(
-            (a, b) => new Date(b.due_date) - new Date(a.due_date)
+            (a, b) => new Date(b.created_at) - new Date(a.created_at)
           );
         } else if (state.filters.sort === "oldest") {
           state.tasks.sort(
-            (a, b) => new Date(a.due_date) - new Date(b.due_date)
+            (a, b) => new Date(a.created_at) - new Date(b.created_at)
           );
         }
       }
@@ -58,11 +58,11 @@ export const taskSlice = createSlice({
         // Applying sorting after updating the task
         if (state.filters.sort === "newest") {
           state.tasks.sort(
-            (a, b) => new Date(b.due_date) - new Date(a.due_date)
+            (a, b) => new Date(b.created_at) - new Date(a.created_at)
           );
         } else if (state.filters.sort === "oldest") {
           state.tasks.sort(
-            (a, b) => new Date(a.due_date) - new Date(b.due_date)
+            (a, b) => new Date(a.created_at) - new Date(b.created_at)
           );
         }
       }
