@@ -26,6 +26,11 @@ function* fetchTasks() {
 
     if (filters.search) queryParams.append("search", filters.search);
 
+    if (filters.due_date_from && filters.due_date_to) {
+      queryParams.append("due_date_from", filters.due_date_from);
+      queryParams.append("due_date_to", filters.due_date_to);
+    }
+
     const response = yield call(() =>
       fetcher(`${TASK_API.FETCH}?${queryParams}`)
     );

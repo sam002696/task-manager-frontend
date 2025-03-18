@@ -4,7 +4,13 @@ const initialState = {
   tasks: [],
   loading: false,
   error: null,
-  filters: { status: "All", sort: "newest", search: "" },
+  filters: {
+    status: "All",
+    sort: "newest",
+    search: "",
+    due_date_from: null,
+    due_date_to: null,
+  },
 };
 
 export const taskSlice = createSlice({
@@ -18,6 +24,17 @@ export const taskSlice = createSlice({
         filteredTasks = filteredTasks.filter(
           (task) => task.status === state.filters.status
         );
+      }
+
+      // applying due date range filter
+      if (state.filters.due_date_from && state.filters.due_date_to) {
+        const from = new Date(state.filters.due_date_from).getTime();
+        const to = new Date(state.filters.due_date_to).getTime();
+
+        filteredTasks = filteredTasks.filter((task) => {
+          const taskDate = new Date(task.due_date).getTime();
+          return taskDate >= from && taskDate <= to;
+        });
       }
 
       if (state.filters.sort === "newest") {

@@ -19,14 +19,20 @@ const MainContent = () => {
     dispatch({
       type: "taskLists",
     });
-  }, [dispatch, filters.status, filters.sort]);
+  }, [
+    dispatch,
+    filters.status,
+    filters.sort,
+    filters.due_date_from,
+    filters.due_date_to,
+  ]);
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
     dispatch({ type: "searchTasks", payload: e.target.value });
   };
 
-  // Handle Drag & Drop
+  // Handling Drag & Drop
   const handleDragEnd = (event) => {
     const { active, over } = event;
 
@@ -44,6 +50,19 @@ const MainContent = () => {
     });
   };
 
+  const clearFilters = () => {
+    dispatch(
+      setFilters({
+        status: "All",
+        sort: "newest",
+        search: "",
+        due_date_from: "",
+        due_date_to: "",
+      })
+    );
+    setSearchTerm("");
+  };
+
   return (
     <DndContext onDragEnd={handleDragEnd}>
       <main className="px-4 py-10 sm:px-6 lg:px-8 lg:py-6">
@@ -54,7 +73,7 @@ const MainContent = () => {
           </div>
 
           {/*  Sorting & Filtering Controls */}
-          <div className="flex gap-4">
+          <div className="flex gap-4 items-center">
             {/*  Search Bar */}
             <Input
               type="text"
@@ -90,11 +109,38 @@ const MainContent = () => {
                 { value: "oldest", label: "Oldest First" },
               ]}
             />
+
+            {/* Date Range Filters */}
+            <Input
+              type="date"
+              value={filters.due_date_from || ""}
+              onChange={(e) =>
+                dispatch(
+                  setFilters({ ...filters, due_date_from: e.target.value })
+                )
+              }
+              placeholder="Due Date From"
+            />
+
+            <Input
+              type="date"
+              value={filters.due_date_to || ""}
+              onChange={(e) =>
+                dispatch(
+                  setFilters({ ...filters, due_date_to: e.target.value })
+                )
+              }
+              placeholder="Due Date To"
+            />
+
+            <Button type="button" variant="secondary" onClick={clearFilters}>
+              Clear Filters
+            </Button>
           </div>
 
           <div>
             <Button
-              type="submit"
+              type="button"
               variant="primary"
               onClick={() => setIsModalOpen(true)}
             >
