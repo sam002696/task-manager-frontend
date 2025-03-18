@@ -1,8 +1,10 @@
 import React from "react";
 import TaskCard from "../tasks/TaskCard";
 import { useDroppable } from "@dnd-kit/core";
+import { useSelector } from "react-redux";
 
 const Column = ({ title, tasks }) => {
+  const taskCounts = useSelector((state) => state.tasks.taskCounts);
   const columnStyles = {
     "To Do": "border-purple-400",
     "In Progress": "border-blue-400",
@@ -19,7 +21,9 @@ const Column = ({ title, tasks }) => {
       className={`bg-white rounded-lg shadow-md p-4 border-t-4 ${columnStyles[title]}`}
     >
       {/* Column Header */}
-      <h3 className="text-lg font-semibold mb-4">{title}</h3>
+      <h3 className="text-lg font-semibold mb-4">
+        {title} <span className="text-gray-500">({taskCounts[title]})</span>
+      </h3>
 
       {/* Tasks Placeholder */}
       <div className="space-y-4">

@@ -13,6 +13,11 @@ const initialState = {
     due_date_to: null,
   },
   activeFilterCount: 2, // Default: "All" & "newest"
+  taskCounts: {
+    "To Do": 0,
+    "In Progress": 0,
+    Done: 0,
+  },
 };
 
 // Sorting Function
@@ -68,6 +73,15 @@ const calculateActiveFilterCount = (filters) => {
   return defaultFilterCount + additionalFilters + dateRangeSelected;
 };
 
+// Function to Calculate Task Counts
+const calculateTaskCounts = (tasks) => {
+  return {
+    "To Do": tasks.filter((task) => task.status === "To Do").length,
+    "In Progress": tasks.filter((task) => task.status === "In Progress").length,
+    Done: tasks.filter((task) => task.status === "Done").length,
+  };
+};
+
 // Task Slice
 export const taskSlice = createSlice({
   name: "tasks",
@@ -75,6 +89,7 @@ export const taskSlice = createSlice({
   reducers: {
     setTasks: (state, { payload }) => {
       state.tasks = filterTasks(payload, state.filters);
+      state.taskCounts = calculateTaskCounts(state.tasks);
     },
 
     addTaskLocal: (state, { payload }) => {
@@ -82,6 +97,7 @@ export const taskSlice = createSlice({
       if (!isDuplicate) {
         state.tasks.push(payload);
         state.tasks = sortTasks(state.tasks, state.filters.sort);
+        state.taskCounts = calculateTaskCounts(state.tasks);
       }
     },
 
@@ -90,11 +106,13 @@ export const taskSlice = createSlice({
       if (index !== -1) {
         state.tasks[index] = { ...state.tasks[index], ...payload };
         state.tasks = sortTasks(state.tasks, state.filters.sort);
+        state.taskCounts = calculateTaskCounts(state.tasks);
       }
     },
 
     deleteTaskLocal: (state, { payload }) => {
       state.tasks = state.tasks.filter((task) => task.id !== payload);
+      state.taskCounts = calculateTaskCounts(state.tasks);
     },
 
     setFilters: (state, { payload }) => {
