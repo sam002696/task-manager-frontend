@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "../ui/Modal";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -9,27 +9,47 @@ import Input from "../ui/Input";
 const SortingFilteringModal = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
   const filters = useSelector((state) => state.tasks.filters);
+  const [localFilters, setLocalFilters] = useState(filters);
+  const [prevFilters, setPrevFilters] = useState(filters);
+
+  // Update local filters when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setLocalFilters(filters);
+      setPrevFilters(filters); // Store previous filters
+    }
+  }, [isOpen, filters]);
 
   const clearFilters = () => {
-    dispatch(
-      setFilters({
-        status: "All",
-        sort: "newest",
-        search: "",
-        due_date_from: "",
-        due_date_to: "",
-      })
-    );
+    setLocalFilters({
+      status: "All",
+      sort: "newest",
+      search: "",
+      due_date_from: null,
+      due_date_to: null,
+    });
   };
 
+  const handleApply = () => {
+    // Check if any filter has changed
+    const filtersChanged =
+      JSON.stringify(localFilters) !== JSON.stringify(prevFilters);
+
+    if (filtersChanged) {
+      dispatch(setFilters(localFilters));
+    }
+
+    // Close modal after applying filters
+    onClose();
+  };
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
       title="Sorting & Filtering"
       primaryAction={{
-        label: "Close",
-        onClick: onClose,
+        label: "Apply",
+        onClick: handleApply,
       }}
       secondaryAction={{
         label: "Clear Filters",
@@ -41,9 +61,9 @@ const SortingFilteringModal = ({ isOpen, onClose }) => {
         <InputSelect
           label={"Status"}
           name="filterStatus"
-          value={filters.status}
+          value={localFilters.status}
           onChange={(e) =>
-            dispatch(setFilters({ ...filters, status: e.target.value }))
+            setLocalFilters({ ...localFilters, status: e.target.value })
           }
           options={[
             { value: "", label: "All" },
@@ -57,9 +77,9 @@ const SortingFilteringModal = ({ isOpen, onClose }) => {
         <InputSelect
           label={"Sort order"}
           name="sortOrder"
-          value={filters.sort}
+          value={localFilters.sort}
           onChange={(e) =>
-            dispatch(setFilters({ ...filters, sort: e.target.value }))
+            setLocalFilters({ ...localFilters, sort: e.target.value })
           }
           options={[
             { value: "newest", label: "Newest First" },
@@ -71,9 +91,9 @@ const SortingFilteringModal = ({ isOpen, onClose }) => {
         <Input
           label={"Due date from"}
           type="date"
-          value={filters.due_date_from || ""}
+          value={localFilters.due_date_from || ""}
           onChange={(e) =>
-            dispatch(setFilters({ ...filters, due_date_from: e.target.value }))
+            setLocalFilters({ ...localFilters, due_date_from: e.target.value })
           }
           placeholder="Due Date From"
         />
@@ -81,9 +101,9 @@ const SortingFilteringModal = ({ isOpen, onClose }) => {
         <Input
           label={"Due date to"}
           type="date"
-          value={filters.due_date_to || ""}
+          value={localFilters.due_date_to || ""}
           onChange={(e) =>
-            dispatch(setFilters({ ...filters, due_date_to: e.target.value }))
+            setLocalFilters({ ...localFilters, due_date_to: e.target.value })
           }
           placeholder="Due Date To"
         />
