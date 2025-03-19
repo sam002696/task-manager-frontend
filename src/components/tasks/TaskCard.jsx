@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDraggable } from "@dnd-kit/core";
 import { PaperClipIcon } from "@heroicons/react/24/outline";
 import { useDispatch } from "react-redux";
@@ -9,6 +9,11 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 
 const TaskCard = ({ id, name, description, status }) => {
+  const dispatch = useDispatch();
+  const taskCardRef = useRef(null);
+  const nameInputRef = useRef(null);
+  const descriptionInputRef = useRef(null);
+  const statusInputRef = useRef(null);
   // State for inline editing
   const [isEditing, setIsEditing] = useState({
     name: false,
@@ -26,7 +31,38 @@ const TaskCard = ({ id, name, description, status }) => {
       id,
       disabled: isAnyFieldEditing,
     });
-  const dispatch = useDispatch();
+
+  // Handling clicking outside the task card
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        taskCardRef.current &&
+        !taskCardRef.current.contains(event.target) &&
+        document.activeElement.tagName !== "INPUT" &&
+        document.activeElement.tagName !== "SELECT"
+      ) {
+        setIsEditing({ name: false, description: false, status: false });
+      }
+    };
+
+    if (isAnyFieldEditing) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isAnyFieldEditing]);
+
+  const handleClickInsideTaskCard = (event) => {
+    if (
+      isAnyFieldEditing &&
+      event.target.tagName !== "INPUT" &&
+      event.target.tagName !== "SELECT"
+    ) {
+      setIsEditing({ name: false, description: false, status: false });
+    }
+  };
 
   // Handling field edit
   const handleEdit = (field) => {
@@ -74,16 +110,21 @@ const TaskCard = ({ id, name, description, status }) => {
 
   return (
     <div
-      ref={setNodeRef}
+      ref={(node) => {
+        setNodeRef(node);
+        taskCardRef.current = node;
+      }}
+      onClick={handleClickInsideTaskCard}
       className={`bg-white p-4 rounded-lg shadow-md border-l-4 flex justify-between items-center transition border-gray-300 
         ${isDragging ? " scale-105" : "hover:bg-gray-50"}`} // Makes it interactive
       style={style}
     >
       {/* Left Side (Task Details) */}
-      <div className="flex-1">
+      <div className="">
         {/* Editable Task Name */}
         {isEditing.name ? (
           <Input
+            ref={nameInputRef}
             type="text"
             name="name"
             value={editedTask.name}
@@ -105,6 +146,7 @@ const TaskCard = ({ id, name, description, status }) => {
         {/* Editable Task Description */}
         {isEditing.description ? (
           <Input
+            ref={descriptionInputRef}
             type="text"
             name="description"
             value={editedTask.description}
@@ -126,6 +168,7 @@ const TaskCard = ({ id, name, description, status }) => {
         {/* Editable Task Status */}
         {isEditing.status ? (
           <InputSelect
+            ref={statusInputRef}
             name="status"
             value={editedTask.status}
             onChange={handleChange}
@@ -146,7 +189,7 @@ const TaskCard = ({ id, name, description, status }) => {
                 ? "bg-blue-100 text-blue-700"
                 : "bg-green-100 text-green-700"
             } cursor-pointer`}
-            onClick={() => handleEdit("status")}
+            onClick={(e) => handleEdit("status", e)}
           >
             {status}
           </span>

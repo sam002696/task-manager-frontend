@@ -9,15 +9,17 @@ const Input = ({
   onBlur,
   onKeyDown,
   autofocus = false,
+  ref,
 }) => {
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col">
       {label && (
         <label className="block text-sm/6 font-medium text-gray-900">
           {label}
         </label>
       )}
       <input
+        ref={ref}
         type={type}
         value={value || ""}
         name={name}
@@ -25,7 +27,7 @@ const Input = ({
         onBlur={onBlur}
         onKeyDown={onKeyDown ? (e) => onKeyDown(e) : undefined}
         placeholder={placeholder}
-        className={`block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border mt-2 ${
+        className={`inline-block w-auto rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border mt-2 ${
           error
             ? "border-red-500 focus:ring-red-500"
             : "border-gray-300 focus:ring-indigo-600"

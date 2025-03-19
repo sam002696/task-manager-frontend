@@ -9,6 +9,7 @@ const InputSelect = ({
   onBlur,
   options,
   error,
+  ref,
 }) => {
   return (
     <div className="w-full">
@@ -23,6 +24,7 @@ const InputSelect = ({
       <div className="mt-2 grid grid-cols-1 relative">
         <select
           id={name}
+          ref={ref}
           name={name}
           value={value}
           onChange={onChange}
