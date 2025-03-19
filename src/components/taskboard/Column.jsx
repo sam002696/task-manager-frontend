@@ -29,11 +29,13 @@ const Column = ({ title, tasks }) => {
       <div className="space-y-4">
         {tasks.map((task) => (
           <TaskCard
-            key={task.id}
-            id={task.id}
-            name={task.name}
-            description={task.description}
-            status={task.status}
+            key={task?.id}
+            id={task?.id}
+            name={task?.name}
+            description={task?.description}
+            status={task?.status}
+            dueDate={task?.due_date}
+            createdAt={task?.created_at}
           />
         ))}
       </div>
