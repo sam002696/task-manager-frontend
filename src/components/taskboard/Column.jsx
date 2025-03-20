@@ -2,9 +2,11 @@ import React from "react";
 import TaskCard from "../tasks/TaskCard";
 import { useDroppable } from "@dnd-kit/core";
 import { useSelector } from "react-redux";
+import TaskSkeleton from "../tasks/TaskSkeleton";
 
 const Column = ({ title, tasks }) => {
   const taskCounts = useSelector((state) => state.tasks.taskCounts);
+  const loading = useSelector((state) => state.tasks.loading);
   const columnStyles = {
     "To Do": "border-purple-400",
     "In Progress": "border-blue-400",
@@ -27,17 +29,23 @@ const Column = ({ title, tasks }) => {
 
       {/* Tasks Placeholder */}
       <div className="space-y-4">
-        {tasks.map((task) => (
-          <TaskCard
-            key={task?.id}
-            id={task?.id}
-            name={task?.name}
-            description={task?.description}
-            status={task?.status}
-            dueDate={task?.due_date}
-            createdAt={task?.created_at}
-          />
-        ))}
+        {loading
+          ? [...Array(tasks.length)].map((_, index) => (
+              <TaskSkeleton key={index} />
+            ))
+          : tasks.length > 0
+          ? tasks.map((task) => (
+              <TaskCard
+                key={task.id}
+                id={task.id}
+                name={task.name}
+                description={task.description}
+                status={task.status}
+                dueDate={task.due_date}
+                createdAt={task.created_at}
+              />
+            ))
+          : null}
       </div>
 
       {/* Add Task Button */}

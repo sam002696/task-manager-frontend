@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import Modal from "../ui/Modal";
 import Input from "../ui/Input";
 import InputSelect from "../ui/InputSelect";
+import Textarea from "../ui/Textarea";
 
 const AddTaskModal = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
@@ -18,7 +19,9 @@ const AddTaskModal = ({ isOpen, onClose }) => {
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Task name is required"),
-      description: Yup.string().required("Description is required"),
+      description: Yup.string()
+        .required("Description is required")
+        .max(200, "Description cannot exceed 200 characters"),
       status: Yup.string().oneOf(["To Do", "In Progress", "Done"]),
       due_date: Yup.string().required("Due date is required"),
     }),
@@ -57,13 +60,13 @@ const AddTaskModal = ({ isOpen, onClose }) => {
           }
         />
 
-        <Input
+        <Textarea
           label="Description"
-          type="text"
           name="description"
           value={formik.values.description}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
+          maxLength={200} // Enforce max length
           error={
             formik.touched.description && formik.errors.description
               ? formik.errors.description

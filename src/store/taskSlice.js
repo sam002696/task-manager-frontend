@@ -87,11 +87,18 @@ export const taskSlice = createSlice({
   name: "tasks",
   initialState,
   reducers: {
+    fetchTasksStart: (state) => {
+      state.loading = true;
+    },
     setTasks: (state, { payload }) => {
       state.tasks = filterTasks(payload, state.filters);
       state.taskCounts = calculateTaskCounts(state.tasks);
+      state.loading = false;
     },
-
+    fetchTasksFailure: (state, { payload }) => {
+      state.error = payload;
+      state.loading = false;
+    },
     addTaskLocal: (state, { payload }) => {
       const isDuplicate = state.tasks.some((task) => task.id === payload.id);
       if (!isDuplicate) {
@@ -128,5 +135,7 @@ export const {
   updateTaskLocal,
   deleteTaskLocal,
   setFilters,
+  fetchTasksStart,
+  fetchTasksFailure,
 } = taskSlice.actions;
 export default taskSlice.reducer;

@@ -8,7 +8,7 @@ import { callApi, clearState, selectApi } from "../store/apiSlice";
 import { AUTH_API } from "../constants/apiConstants";
 import { Link, useNavigate } from "react-router";
 import { AuthUser } from "../helpers/AuthUser";
-import Taskify from "../../public/images/taskify.png";
+import Taskify from "../../src/assets/images/taskify.png";
 
 const Login = () => {
   const dispatch = useDispatch();

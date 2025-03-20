@@ -11,7 +11,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { navigation } from "../../constants/navigation";
 import { Link, useNavigate } from "react-router";
-import TaskifyLogo from "../../../public/images/taskify-logo.png";
+import TaskifyLogo from "../../assets/images/taskify-logo.png";
 import { AuthUser } from "../../helpers/AuthUser";
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {

@@ -7,7 +7,7 @@ import { Link, useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { callApi, selectApi } from "../store/apiSlice";
 import { AUTH_API } from "../constants/apiConstants";
-import Taskify from "../../public/images/taskify.png";
+import Taskify from "../../src/assets/images/taskify.png";
 
 const Register = () => {
   const dispatch = useDispatch();
