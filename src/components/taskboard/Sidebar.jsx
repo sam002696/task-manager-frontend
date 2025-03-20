@@ -5,13 +5,24 @@ import {
   DialogPanel,
   TransitionChild,
 } from "@headlessui/react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import {
+  XMarkIcon,
+  ArrowRightEndOnRectangleIcon,
+} from "@heroicons/react/24/outline";
 import { navigation } from "../../constants/navigation";
-import { useLocation, Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import TaskifyLogo from "../../../public/images/taskify-logo.png";
+import { AuthUser } from "../../helpers/AuthUser";
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
-  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Handling Logout
+  const handleLogout = () => {
+    AuthUser.logout();
+    navigate("/login");
+  };
+
   return (
     <>
       {/*  Mobile Sidebar */}
@@ -62,18 +73,29 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                   ))}
                 </ul>
               </nav>
+
+              {/* Logout Button  */}
+              <div className="mt-auto pb-4">
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center justify-center p-3 text-sm font-semibold text-gray-400 hover:bg-gray-800 hover:text-white rounded-md mx-auto cursor-pointer"
+                >
+                  <ArrowRightEndOnRectangleIcon className="size-6 shrink-0" />
+                  Logout
+                </button>
+              </div>
             </div>
           </DialogPanel>
         </div>
       </Dialog>
 
       {/*  Desktop Sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:block lg:w-20 lg:bg-gray-900">
+      <div className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:flex-col lg:w-20 lg:bg-gray-900">
         <div className="flex h-16 items-center justify-center">
           <img src={TaskifyLogo} className="h-12 w-auto" />
         </div>
-        <nav className="mt-8">
-          <ul className="flex flex-col items-center space-y-1">
+        <nav className="mt-8 flex flex-col flex-grow">
+          <ul className="flex flex-col items-center space-y-1 flex-grow">
             {navigation.map((item) => (
               <li key={item.name}>
                 <Link
@@ -89,6 +111,16 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
               </li>
             ))}
           </ul>
+
+          {/* Logout Icon  */}
+          <div className="pb-4">
+            <button
+              onClick={handleLogout}
+              className="flex items-center justify-center p-3 text-sm font-semibold text-gray-400 bg-gray-800 hover:text-white rounded-md mx-auto cursor-pointer"
+            >
+              <ArrowRightEndOnRectangleIcon className="size-6 shrink-0 text-red-500 hover:text-red-600" />
+            </button>
+          </div>
         </nav>
       </div>
     </>

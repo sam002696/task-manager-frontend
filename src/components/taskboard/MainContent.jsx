@@ -5,7 +5,7 @@ import { DndContext } from "@dnd-kit/core";
 import AddTaskModal from "../tasks/AddTaskModal";
 import { useDispatch, useSelector } from "react-redux";
 import Input from "../ui/Input";
-import { FunnelIcon } from "@heroicons/react/24/outline";
+import { FunnelIcon, PlusIcon } from "@heroicons/react/24/outline";
 import SortingFilteringModal from "../tasks/SortingFilteringModal";
 
 const MainContent = () => {
@@ -84,7 +84,7 @@ const MainContent = () => {
               placeholder="Search tasks..."
               value={searchTerm}
               onChange={handleSearchChange}
-              className="w-full" // Ensures search bar takes full width
+              className="w-full"
             />
           </div>
 
@@ -93,6 +93,8 @@ const MainContent = () => {
             <Button
               type="button"
               variant="primary"
+              icon={PlusIcon}
+              iconPosition="left"
               onClick={() => setIsModalOpen(true)}
               className="px-5 py-2"
             >

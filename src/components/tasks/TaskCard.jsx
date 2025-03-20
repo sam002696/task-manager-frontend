@@ -194,7 +194,7 @@ const TaskCard = ({ id, name, description, status, dueDate, createdAt }) => {
           />
         ) : (
           <p
-            className="mt-1 text-sm text-gray-600 cursor-pointer"
+            className="mt-2 text-sm text-gray-600 cursor-pointer"
             onClick={() => handleEdit("description")}
           >
             {description}
@@ -218,7 +218,7 @@ const TaskCard = ({ id, name, description, status, dueDate, createdAt }) => {
           />
         ) : (
           <span
-            className={`mt-2 inline-block px-2 py-1 text-xs font-medium rounded ${
+            className={`mt-3 inline-block px-2 py-1 text-xs font-medium rounded ${
               status === "To Do"
                 ? "bg-purple-100 text-purple-700"
                 : status === "In Progress"
