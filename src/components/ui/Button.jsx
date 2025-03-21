@@ -12,7 +12,7 @@ const Button = ({
   className = "",
 }) => {
   const baseStyles =
-    "flex justify-center rounded-md px-4 py-2 text-sm font-semibold shadow-xs focus-visible:outline-2 focus-visible:outline-offset-2 w-full";
+    "flex justify-center rounded-md px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 w-full";
 
   const variants = {
     primary:
@@ -33,9 +33,16 @@ const Button = ({
       className={`${baseStyles} ${
         variants[isLoading ? "secondary" : variant]
       } ${isLoading ? " cursor-not-allowed" : " cursor-pointer "} ${className}`}
+      style={{ minWidth: "90px" }}
     >
       {Icon && iconPosition === "left" && <Icon className="size-5 mr-2" />}
-      {isLoading ? <DotsLoader /> : children}
+      {isLoading ? (
+        <span className="inline-flex w-[60px] justify-center">
+          <DotsLoader />
+        </span>
+      ) : (
+        children
+      )}
       {Icon && iconPosition === "right" && <Icon className="size-5" />}
     </button>
   );

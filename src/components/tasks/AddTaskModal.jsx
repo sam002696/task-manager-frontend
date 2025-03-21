@@ -7,7 +7,7 @@ import Input from "../ui/Input";
 import InputSelect from "../ui/InputSelect";
 import Textarea from "../ui/Textarea";
 
-const AddTaskModal = ({ isOpen, onClose }) => {
+const AddTaskModal = ({ isOpen, onClose, status }) => {
   const isLoading = useSelector((state) => state.tasks.loading);
   const dispatch = useDispatch();
 
@@ -15,7 +15,7 @@ const AddTaskModal = ({ isOpen, onClose }) => {
     initialValues: {
       name: "",
       description: "",
-      status: "To Do",
+      status: status || "",
       due_date: "",
     },
     validationSchema: Yup.object({
@@ -23,7 +23,9 @@ const AddTaskModal = ({ isOpen, onClose }) => {
       description: Yup.string()
         .required("Description is required")
         .max(200, "Description cannot exceed 200 characters"),
-      status: Yup.string().oneOf(["To Do", "In Progress", "Done"]),
+      status: Yup.string()
+        .oneOf(["To Do", "In Progress", "Done"], "Please select a valid status")
+        .required("Status is required"),
       due_date: Yup.string().required("Due date is required"),
     }),
     onSubmit: (values) => {
@@ -85,6 +87,7 @@ const AddTaskModal = ({ isOpen, onClose }) => {
           value={formik.values.status}
           onChange={formik.handleChange}
           options={[
+            { value: "", label: "Select Status" },
             { value: "To Do", label: "To Do" },
             { value: "In Progress", label: "In Progress" },
             { value: "Done", label: "Done" },

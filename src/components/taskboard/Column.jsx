@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import TaskCard from "../tasks/TaskCard";
 import { useDroppable } from "@dnd-kit/core";
 import { useSelector } from "react-redux";
 import TaskSkeleton from "../tasks/TaskSkeleton";
+import { PlusIcon } from "@heroicons/react/24/outline";
+import Button from "../ui/Button";
+import AddTaskModal from "../tasks/AddTaskModal";
 
 const Column = ({ title, tasks }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const taskCounts = useSelector((state) => state.tasks.taskCounts);
   const loading = useSelector((state) => state.tasks.loading);
   const columnStyles = {
@@ -62,6 +66,19 @@ const Column = ({ title, tasks }) => {
         </p>
       </div>
 
+      {/* Add Task Button */}
+      <div className="mt-2 mb-4">
+        <Button
+          type="button"
+          variant="filter"
+          onClick={() => setIsModalOpen(true)}
+          icon={PlusIcon}
+          iconPosition="left"
+        >
+          Add Task
+        </Button>
+      </div>
+
       {/* Tasks Placeholder */}
       <div className="space-y-4">
         {loading
@@ -82,11 +99,14 @@ const Column = ({ title, tasks }) => {
             ))
           : null}
       </div>
-
-      {/* Add Task Button */}
-      <button className="mt-4 w-full text-indigo-500 font-semibold">
-        + Add Task
-      </button>
+      {/* Task Modal */}
+      {isModalOpen && (
+        <AddTaskModal
+          status={title}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
     </div>
   );
 };
