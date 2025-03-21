@@ -5,7 +5,7 @@ import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 import { Link, useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
-import { callApi, selectApi } from "../store/apiSlice";
+import { callApi, clearState, selectApi } from "../store/apiSlice";
 import { AUTH_API } from "../constants/apiConstants";
 import Taskify from "../../src/assets/images/taskify.png";
 
@@ -25,13 +25,20 @@ const Register = () => {
   // If registration is successful, navigating to the login page
   useEffect(() => {
     if (registerInfo?.status === "success") {
+      dispatch(
+        clearState({
+          // Clearing the registerInfo state after registration
+          output: "registerInfo",
+        })
+      );
       navigate("/login");
     }
-  }, [registerInfo?.status, navigate]);
+  }, [registerInfo?.status, navigate, dispatch]);
 
   // Setting up form handling with Formik
   const formik = useFormik({
     initialValues: {
+      name: "",
       email: "",
       password: "",
     },
@@ -77,7 +84,7 @@ const Register = () => {
               label="Name"
               type="text"
               name="name"
-              placeholder="Enter your email"
+              placeholder="Enter your name"
               value={formik.values.name}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
