@@ -87,16 +87,16 @@ export const taskSlice = createSlice({
   name: "tasks",
   initialState,
   reducers: {
-    fetchTasksStart: (state) => {
+    setLoading: (state) => {
       state.loading = true;
+    },
+    setError: (state, { payload }) => {
+      state.error = payload;
+      state.loading = false;
     },
     setTasks: (state, { payload }) => {
       state.tasks = filterTasks(payload, state.filters);
       state.taskCounts = calculateTaskCounts(state.tasks);
-      state.loading = false;
-    },
-    fetchTasksFailure: (state, { payload }) => {
-      state.error = payload;
       state.loading = false;
     },
     addTaskLocal: (state, { payload }) => {
@@ -106,6 +106,7 @@ export const taskSlice = createSlice({
         state.tasks = sortTasks(state.tasks, state.filters.sort);
         state.taskCounts = calculateTaskCounts(state.tasks);
       }
+      state.loading = false;
     },
 
     updateTaskLocal: (state, { payload }) => {
@@ -135,7 +136,7 @@ export const {
   updateTaskLocal,
   deleteTaskLocal,
   setFilters,
-  fetchTasksStart,
-  fetchTasksFailure,
+  setLoading,
+  setError,
 } = taskSlice.actions;
 export default taskSlice.reducer;

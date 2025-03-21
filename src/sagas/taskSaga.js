@@ -6,8 +6,8 @@ import {
   updateTaskLocal,
   deleteTaskLocal,
   setFilters,
-  fetchTasksFailure,
-  fetchTasksStart,
+  setError,
+  setLoading,
 } from "../store/taskSlice";
 import { TASK_API } from "../constants/apiConstants";
 import fetcher from "../api/fetcher";
@@ -15,7 +15,7 @@ import { setToastAlert } from "../store/errorSlice";
 
 function* fetchTasks() {
   try {
-    yield put(fetchTasksStart());
+    yield put(setLoading());
     const filters = yield select((state) => state.tasks.filters); // Getting filters from Redux
 
     let queryParams = new URLSearchParams();
@@ -45,13 +45,15 @@ function* fetchTasks() {
     yield put(succeed({ response, output: "taskLists" }));
   } catch (error) {
     yield put(failed({ error: error.message }));
-    yield put(fetchTasksFailure(error.message));
+    yield put(setError(error.message));
   }
 }
 
 function* addTask(action) {
   try {
     const { taskData, onSuccess } = action.payload;
+
+    yield put(setLoading());
 
     const response = yield call(() =>
       fetcher(TASK_API.CREATE, {
@@ -90,7 +92,7 @@ function* addTask(action) {
     throw new Error("Invalid API response. Task data is missing.");
   } catch (error) {
     const errorMessage = error?.response?.message;
-
+    yield put(setError(errorMessage));
     yield put(failed({ error: errorMessage }));
     yield put(
       setToastAlert({

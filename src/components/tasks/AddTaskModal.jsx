@@ -1,13 +1,14 @@
 import React from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Modal from "../ui/Modal";
 import Input from "../ui/Input";
 import InputSelect from "../ui/InputSelect";
 import Textarea from "../ui/Textarea";
 
 const AddTaskModal = ({ isOpen, onClose }) => {
+  const isLoading = useSelector((state) => state.tasks.loading);
   const dispatch = useDispatch();
 
   const formik = useFormik({
@@ -44,7 +45,11 @@ const AddTaskModal = ({ isOpen, onClose }) => {
       isOpen={isOpen}
       onClose={onClose}
       title="Add New Task"
-      primaryAction={{ label: "Add Task", onClick: formik.handleSubmit }}
+      primaryAction={{
+        label: "Add Task",
+        onClick: formik.handleSubmit,
+        loading: isLoading,
+      }}
       secondaryAction={{ label: "Cancel", onClick: onClose }}
     >
       <form onSubmit={formik.handleSubmit} className="space-y-4">

@@ -25,13 +25,13 @@ const Modal = ({
         <DialogPanel className="w-full max-w-lg rounded-lg bg-white shadow-lg p-6">
           {/* Modal Title */}
           {title && (
-            <DialogTitle className="text-lg font-semibold text-gray-900">
+            <DialogTitle className="text-lg font-semibold text-gray-900 underline underline-offset-8">
               {title}
             </DialogTitle>
           )}
 
           {/* Modal Content */}
-          <div className="mt-4">{children}</div>
+          <div className="mt-7">{children}</div>
 
           {/* Modal Actions */}
           <div className="mt-6 flex justify-end gap-3">
@@ -41,7 +41,11 @@ const Modal = ({
               </Button>
             )}
             {primaryAction && (
-              <Button variant="primary" onClick={primaryAction.onClick}>
+              <Button
+                variant="primary"
+                onClick={primaryAction.onClick}
+                isLoading={primaryAction.loading}
+              >
                 {primaryAction.label}
               </Button>
             )}
