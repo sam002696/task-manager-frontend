@@ -13,24 +13,29 @@ const Register = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // Getting the loading state and registration response from Redux store
   const {
-    loading,
+    loading, // True when API request is in progress
     registerInfo = {
+      // Stores registration response (success or failure)
       data: {},
     },
   } = useSelector(selectApi);
 
+  // If registration is successful, navigating to the login page
   useEffect(() => {
     if (registerInfo?.status === "success") {
       navigate("/login");
     }
   }, [registerInfo?.status, navigate]);
 
+  // Setting up form handling with Formik
   const formik = useFormik({
     initialValues: {
       email: "",
       password: "",
     },
+    // Form validation rules using Yup
     validationSchema: Yup.object({
       name: Yup.string().required("Name is required"),
       email: Yup.string()
@@ -40,16 +45,16 @@ const Register = () => {
         .min(6, "Password must be at least 6 characters")
         .required("Password is required"),
     }),
+    // What happens when the form is submitted
     onSubmit: (values) => {
-      console.log("values", values);
       dispatch(
         callApi({
           operationId: AUTH_API.REGISTER,
           parameters: {
-            method: "POST",
-            body: JSON.stringify(values),
+            method: "POST", // The API endpoint for registration
+            body: JSON.stringify(values), // Convert form data to JSON format
           },
-          output: "registerInfo",
+          output: "registerInfo", // Store API response in Redux under `registerInfo`
           storeName: "registerInfo",
         })
       );

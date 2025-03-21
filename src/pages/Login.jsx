@@ -13,16 +13,21 @@ import Taskify from "../../src/assets/images/taskify.png";
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  // Getting loading state and login response from Redux store
   const {
-    loading,
+    loading, // True while the API request is in progress
     loginInfo = {
+      // Stores the login response (success or failure)
       data: {},
     },
   } = useSelector(selectApi);
 
+  // If login is successful, saving the login data and navigating to the taskboard
   useEffect(() => {
     if (loginInfo?.status === "success" && loginInfo?.data?.token) {
       AuthUser.saveLoginData(loginInfo?.data);
+      // Clearing the loginInfo state after saving the login data
+      // This is done to prevent the login data from being stored in Redux
       dispatch(
         clearState({
           output: "loginInfo",
@@ -38,11 +43,13 @@ const Login = () => {
     dispatch,
   ]);
 
+  // Setting up form handling with Formik
   const formik = useFormik({
     initialValues: {
       email: "",
       password: "",
     },
+    // Form validation rules using Yup
     validationSchema: Yup.object({
       email: Yup.string()
         .email("Invalid email format")
@@ -51,16 +58,18 @@ const Login = () => {
         .min(6, "Password must be at least 6 characters")
         .required("Password is required"),
     }),
+    // What happens when the form is submitted
     onSubmit: (values) => {
       console.log("values", values);
       dispatch(
         callApi({
-          operationId: AUTH_API.LOGIN,
+          // Making an API request to login
+          operationId: AUTH_API.LOGIN, // The API endpoint for login
           parameters: {
-            method: "POST",
-            body: JSON.stringify(values),
+            method: "POST", // POST method for login
+            body: JSON.stringify(values), // Convert form data to JSON format
           },
-          output: "loginInfo",
+          output: "loginInfo", // Store API response in Redux under `loginInfo`
           storeName: "loginInfo",
         })
       );

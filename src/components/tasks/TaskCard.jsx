@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDraggable } from "@dnd-kit/core";
-import { PaperClipIcon } from "@heroicons/react/24/outline";
+// import { PaperClipIcon } from "@heroicons/react/24/outline";
 import { useDispatch } from "react-redux";
 import InputSelect from "../ui/InputSelect";
 import Input from "../ui/Input";
@@ -16,71 +16,91 @@ import { formatDate } from "../../utils/dateUtils";
 
 const TaskCard = ({ id, name, description, status, dueDate, createdAt }) => {
   const dispatch = useDispatch();
-  const taskCardRef = useRef(null);
-  const nameInputRef = useRef(null);
-  const descriptionInputRef = useRef(null);
-  const statusInputRef = useRef(null);
-  // State for inline editing
+
+  // Refs for interacting with DOM elements
+  const taskCardRef = useRef(null); // Main wrapper for the task card
+  const nameInputRef = useRef(null); // Input for task name
+  const descriptionInputRef = useRef(null); // Input for description
+  const statusInputRef = useRef(null); // Select input for status
+
+  // Controls which field is currently being edited inline
   const [isEditing, setIsEditing] = useState({
     name: false,
     description: false,
     status: false,
   });
+
+  // Keeps track of which field is pending to be edited (delayed update)
   const [pendingEdit, setPendingEdit] = useState(null);
 
+  // Stores editable data for the current task
   const [editedTask, setEditedTask] = useState({ name, description, status });
+
+  // Controls delete confirmation modal
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
+  // Boolean: true if *any* field is in editing mode
   const isAnyFieldEditing = Object.values(isEditing).some((value) => value);
 
+  // Setting up drag-and-drop logic using DnD Kit
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
       id,
-      disabled: isAnyFieldEditing,
+      disabled: isAnyFieldEditing, // Disable dragging while editing
     });
 
-  // Handling clicking outside the task card
+  // Handling clicking outside the card to close any open field
   useEffect(() => {
     const handleClickOutside = (event) => {
+      // Closing all fields if clicked outside the card
+      // and the active element is not an input or select element
+      // This is to prevent closing fields when typing inside them
       if (
         taskCardRef.current &&
         !taskCardRef.current.contains(event.target) &&
         document.activeElement.tagName !== "INPUT" &&
         document.activeElement.tagName !== "SELECT"
       ) {
+        // Resetting all editing states
         setIsEditing({ name: false, description: false, status: false });
       }
     };
 
+    // Adding event listener when any field is in editing mode
     if (isAnyFieldEditing) {
       document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
+      // Removing event listener when no field is in editing mode
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isAnyFieldEditing]);
 
+  // Handling clicking inside the task card to close fields
   const handleClickInsideTaskCard = (event) => {
     if (
+      // If the click is inside the task card
       isAnyFieldEditing &&
       event.target.tagName !== "INPUT" &&
       event.target.tagName !== "SELECT"
     ) {
+      // Resetting all editing states
       setIsEditing({ name: false, description: false, status: false });
     }
   };
 
   // Handling field edit
   const handleEdit = (field) => {
-    setIsEditing({ name: false, description: false, status: false }); // Close all fields first
-    setPendingEdit(field); // Store the field that should be opened next
+    setIsEditing({ name: false, description: false, status: false }); // Closing all fields first
+    setPendingEdit(field); // Storing the field that should be opened next
   };
 
+  // Handling pending edit
   useEffect(() => {
     if (pendingEdit) {
       setIsEditing((prev) => ({ ...prev, [pendingEdit]: true }));
-      setPendingEdit(null); // Reset pending edit to avoid looping
+      setPendingEdit(null); // Reseting pending edit to avoid looping
     }
   }, [pendingEdit]);
 
@@ -102,25 +122,29 @@ const TaskCard = ({ id, name, description, status, dueDate, createdAt }) => {
       return;
     }
 
-    // Dispatching update API call via saga
+    // Dispatching Redux action to update the task
     dispatch({
-      type: "updateTask",
+      type: "updateTask", // Redux action to update task
       payload: {
-        taskId: id,
-        taskData: { [field]: editedTask[field] },
+        taskId: id, // ID of the task
+        taskData: { [field]: editedTask[field] }, // Updating the task's field
       },
     });
   };
 
+  // Task card styles
   const style = {
+    // Applying transform for dragging
     transform: transform
       ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
       : "none",
+    // Applying opacity for dragging
     transition: isDragging
       ? "none"
       : "transform 150ms ease-in-out, opacity 150ms ease-in-out",
+    // Applying opacity for dragging
     willChange: "transform, opacity",
-    opacity: isDragging ? 0.9 : 1, // Adjust opacity for better visibility
+    opacity: isDragging ? 0.9 : 1, // Adjusting opacity for better visibility
   };
 
   return (
@@ -136,9 +160,9 @@ const TaskCard = ({ id, name, description, status, dueDate, createdAt }) => {
     >
       {/* Left Side (Task Details) */}
 
-      {/* Task due date */}
-
       <div className="">
+        {/* Task created date */}
+
         <div className="inline-flex items-center gap-x-0.5 rounded-md bg-stone-100 px-2 py-1 text-xs font-medium text-stone-600 mb-2">
           <div className="group relative -ml-1 size-3.5 rounded-xs hover:bg-gray-500/20">
             <span className="sr-only">Remove</span>
@@ -147,6 +171,8 @@ const TaskCard = ({ id, name, description, status, dueDate, createdAt }) => {
           </div>
           Task created : {formatDate(createdAt)}
         </div>
+
+        {/* Task due date */}
 
         <div className="inline-flex items-center gap-x-0.5 rounded-md bg-red-100 px-2 py-1 text-xs font-medium text-red-600 mb-2">
           <div className="group relative -ml-1 size-3.5 rounded-xs hover:bg-gray-500/20">
@@ -258,7 +284,7 @@ const TaskCard = ({ id, name, description, status, dueDate, createdAt }) => {
           </Menu>
         </div>
 
-        {/* Paperclip Icon (Bottom-Right) */}
+        {/* Drag Handle (Bottom-Right) */}
         {!isAnyFieldEditing && (
           <div className="mt-auto">
             <div

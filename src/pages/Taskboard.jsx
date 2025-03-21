@@ -5,6 +5,7 @@ import MainContent from "../components/taskboard/MainContent";
 import Sidebar from "../components/taskboard/SIdebar";
 
 const Taskboard = () => {
+  // State to manage the sidebar
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (

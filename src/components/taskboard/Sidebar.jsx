@@ -17,8 +17,9 @@ import { AuthUser } from "../../helpers/AuthUser";
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const navigate = useNavigate();
 
-  // Handling Logout
+  // Logout Function
   const handleLogout = () => {
+    // Helper function to logout the user
     AuthUser.logout();
     navigate("/login");
   };
@@ -48,10 +49,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
             <div className="flex grow flex-col bg-gray-900 px-6 pb-2">
               <div className="flex h-16 shrink-0 items-center">
-                <img
-                  src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
-                  className="h-8 w-auto"
-                />
+                <img src={TaskifyLogo} className="h-12 w-auto" />
               </div>
 
               <nav className="flex flex-1 flex-col">

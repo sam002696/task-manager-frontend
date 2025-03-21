@@ -5,10 +5,13 @@ import { AuthUser } from "../../helpers/AuthUser";
 import { useNavigate } from "react-router";
 
 const UserDropdown = () => {
+  // Getting user data
   const user = AuthUser?.getUser();
   const navigate = useNavigate();
 
+  // Logout function
   const handleLogout = () => {
+    // Helper function to logout the user
     AuthUser.logout();
     navigate("/login");
   };

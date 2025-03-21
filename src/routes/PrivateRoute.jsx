@@ -4,6 +4,9 @@ import { AuthUser } from "../helpers/AuthUser";
 import Unauthorized from "../pages/Unauthorized";
 
 const PrivateRoute = () => {
+  // Checking if the user is authenticated
+  // If authenticated, rendering the child routes
+  // If not authenticated, rendering the Unauthorized page
   return AuthUser.isAuthenticated() ? <Outlet /> : <Unauthorized />;
 };
 

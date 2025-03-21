@@ -8,21 +8,23 @@ import Input from "../ui/Input";
 
 const SortingFilteringModal = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
-  const filters = useSelector((state) => state.tasks.filters);
-  const [localFilters, setLocalFilters] = useState(filters);
-  const [prevFilters, setPrevFilters] = useState(filters);
-  const [errors, setErrors] = useState({});
+  const filters = useSelector((state) => state.tasks.filters); // Currently applied filters
+  const [localFilters, setLocalFilters] = useState(filters); // Local state for filters
+  const [prevFilters, setPrevFilters] = useState(filters); // Storing previous filters
+  const [errors, setErrors] = useState({}); // Local state for form errors
 
   // Updating local filters when modal opens
   useEffect(() => {
+    // If the modal is open, updating local filters
     if (isOpen) {
-      setLocalFilters(filters);
+      setLocalFilters(filters); // Setting local filters to the current filters
       setPrevFilters(filters); // Storing previous filters
-      setErrors({});
+      setErrors({}); // Clearing any previous errors
     }
   }, [isOpen, filters]);
 
   const clearFilters = () => {
+    // Resetting filters to default values
     setLocalFilters({
       status: "All",
       sort: "newest",
@@ -30,33 +32,42 @@ const SortingFilteringModal = ({ isOpen, onClose }) => {
       due_date_from: null,
       due_date_to: null,
     });
+    // Clearing any previous errors
     setErrors({});
   };
 
+  // Function to apply filters
   const handleApply = () => {
+    // Validating date range filters
     const { due_date_from, due_date_to } = localFilters;
+    // Creating a new errors object
     const newErrors = {};
 
+    // Checking if due date from is greater than due date to
     if (due_date_from && !due_date_to) {
       newErrors.due_date_to = "Due date to needs to be selected";
     }
-
+    // Checking if due date to is less than due date from
     if (due_date_to && !due_date_from) {
       newErrors.due_date_from = "Due date from needs to be selected";
     }
 
+    // Updating errors state
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
 
+    // Checking if filters have changed
+    // If filters have changed, updating Redux state
     const filtersChanged =
       JSON.stringify(localFilters) !== JSON.stringify(prevFilters);
 
     if (filtersChanged) {
-      dispatch(setFilters(localFilters));
+      dispatch(setFilters(localFilters)); // Dispatching Redux action to update filters
     }
 
+    // Closing the modal
     onClose();
   };
 

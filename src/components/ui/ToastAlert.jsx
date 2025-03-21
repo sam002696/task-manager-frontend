@@ -5,9 +5,11 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const ToastAlert = () => {
+  // Getting toast alert state from Redux
   const { type, message } = useSelector(selectToastAlert);
   const dispatch = useDispatch();
 
+  // Showing toast alert when type and message are available
   useEffect(() => {
     if (type && message) {
       switch (type) {
@@ -34,7 +36,7 @@ const ToastAlert = () => {
           toast(message);
       }
 
-      // Clear toast alert after showing
+      // Clearing toast alert after showing
       dispatch(clearToastAlert());
     }
   }, [type, message, dispatch]);

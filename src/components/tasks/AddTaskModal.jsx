@@ -8,9 +8,11 @@ import InputSelect from "../ui/InputSelect";
 import Textarea from "../ui/Textarea";
 
 const AddTaskModal = ({ isOpen, onClose, status }) => {
+  // Getting loading state from Redux
   const isLoading = useSelector((state) => state.tasks.loading);
   const dispatch = useDispatch();
 
+  // Formik form setup
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -18,6 +20,7 @@ const AddTaskModal = ({ isOpen, onClose, status }) => {
       status: status || "",
       due_date: "",
     },
+    // Form validation schema
     validationSchema: Yup.object({
       name: Yup.string().required("Task name is required"),
       description: Yup.string()
@@ -28,14 +31,16 @@ const AddTaskModal = ({ isOpen, onClose, status }) => {
         .required("Status is required"),
       due_date: Yup.string().required("Due date is required"),
     }),
+    // Form submission handler
     onSubmit: (values) => {
       dispatch({
-        type: "taskAdd",
+        type: "taskAdd", // Redux action to add a new task
         payload: {
-          taskData: values,
+          taskData: values, // Task data from the form
           onSuccess: () => {
-            formik.resetForm();
-            onClose();
+            // Resetting the form and closing the modal
+            formik.resetForm(); // Resetting the form
+            onClose(); // Closing the modal
           },
         },
       });

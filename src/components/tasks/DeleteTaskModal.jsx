@@ -3,16 +3,17 @@ import Modal from "../ui/Modal";
 import { useDispatch, useSelector } from "react-redux";
 
 const DeleteTaskModal = ({ isOpen, onClose, taskId, taskName }) => {
+  // Getting loading state from Redux
   const isLoading = useSelector((state) => state.tasks.loading);
   const dispatch = useDispatch();
 
-  // Handle task deletion
+  // Function to delete the task
   const handleDelete = () => {
     dispatch({
-      type: "deleteTask",
+      type: "deleteTask", // Redux action to delete a task
       payload: {
-        taskId,
-        onSuccess: () => onClose(),
+        taskId, // ID of the task to delete
+        onSuccess: () => onClose(), // Closing the modal on success
       },
     });
   };

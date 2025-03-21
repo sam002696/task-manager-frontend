@@ -8,17 +8,23 @@ import Button from "../ui/Button";
 import AddTaskModal from "../tasks/AddTaskModal";
 
 const Column = ({ title, tasks }) => {
+  // Local state to control the "Add Task" modal visibility
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const taskCounts = useSelector((state) => state.tasks.taskCounts);
-  const loading = useSelector((state) => state.tasks.loading);
+
+  // Pulling task counts and loading state from Redux
+  const taskCounts = useSelector((state) => state.tasks.taskCounts); // Number of tasks in each column
+  const loading = useSelector((state) => state.tasks.loading); // Whether tasks are currently being loaded
+
+  // Styling for the column borders based on their status
   const columnStyles = {
     "To Do": "border-purple-400",
     "In Progress": "border-blue-400",
     Done: "border-green-400",
   };
 
+  // Setting up this column as a droppable area for drag-and-drop
   const { setNodeRef } = useDroppable({
-    id: title,
+    id: title, // Unique ID for the column (usually the status name)
   });
 
   return (
@@ -79,14 +85,19 @@ const Column = ({ title, tasks }) => {
         </Button>
       </div>
 
-      {/* Tasks Placeholder */}
+      {/* Task cards */}
       <div className="space-y-4">
         {loading
-          ? [...Array(tasks.length)].map((_, index) => (
+          ? // If tasks are still loading, showing skeleton placeholders
+            // for each task
+            // [...Array(tasks.length)] creates an array of the same length as tasks
+            // .map() then maps over this array to create a skeleton for each task
+            [...Array(tasks.length)].map((_, index) => (
               <TaskSkeleton key={index} />
             ))
           : tasks.length > 0
-          ? tasks.map((task) => (
+          ? // If tasks exist, rendering each one inside a TaskCard component
+            tasks.map((task) => (
               <TaskCard
                 key={task.id}
                 id={task.id}
@@ -99,6 +110,7 @@ const Column = ({ title, tasks }) => {
             ))
           : null}
       </div>
+
       {/* Task Modal */}
       {isModalOpen && (
         <AddTaskModal

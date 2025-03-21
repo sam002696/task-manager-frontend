@@ -7,6 +7,7 @@ const Register = lazy(() => import("../pages/Register"));
 const Taskboard = lazy(() => import("../pages/Taskboard"));
 const NotFound = lazy(() => import("../pages/NotFound"));
 
+// Defining routes
 const routes = [
   { path: "/", element: <Navigate to="/login" replace /> },
   {
