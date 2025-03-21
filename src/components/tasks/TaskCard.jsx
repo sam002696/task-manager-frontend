@@ -249,7 +249,7 @@ const TaskCard = ({ id, name, description, status, dueDate, createdAt }) => {
                 <button
                   onClick={() => setIsDeleteModalOpen(true)}
                   type="button"
-                  className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+                  className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
                 >
                   Delete task
                 </button>

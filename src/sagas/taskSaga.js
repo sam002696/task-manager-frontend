@@ -146,7 +146,9 @@ function* deleteTask(action) {
   let previousTasks = [];
 
   try {
-    const { taskId } = action.payload;
+    const { taskId, onSuccess } = action.payload;
+
+    yield put(setLoading());
 
     // Save previous state for rollback in case of failure
     previousTasks = yield select((state) => state.tasks.tasks);
@@ -161,11 +163,15 @@ function* deleteTask(action) {
       })
     );
 
-    // Success handling
-    yield put(succeed({ output: TASK_API.DELETE(taskId) }));
-    yield put(setToastAlert({ type: "success", message: response?.message }));
+    if (response?.status === "success") {
+      yield put(succeed({ output: TASK_API.DELETE(taskId) }));
+      yield put(setToastAlert({ type: "success", message: response?.message }));
+
+      if (onSuccess) onSuccess();
+    }
   } catch (error) {
     const errorMessage = error?.response?.message;
+    yield put(setError(errorMessage));
     yield put(failed({ error: errorMessage }));
 
     // Rollback UI update in case of failure

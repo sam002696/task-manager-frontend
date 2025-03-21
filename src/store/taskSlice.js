@@ -121,6 +121,7 @@ export const taskSlice = createSlice({
     deleteTaskLocal: (state, { payload }) => {
       state.tasks = state.tasks.filter((task) => task.id !== payload);
       state.taskCounts = calculateTaskCounts(state.tasks);
+      state.loading = false;
     },
 
     setFilters: (state, { payload }) => {

@@ -1,18 +1,20 @@
 import React from "react";
 import Modal from "../ui/Modal";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const DeleteTaskModal = ({ isOpen, onClose, taskId, taskName }) => {
+  const isLoading = useSelector((state) => state.tasks.loading);
   const dispatch = useDispatch();
 
   // Handle task deletion
   const handleDelete = () => {
     dispatch({
       type: "deleteTask",
-      payload: { taskId },
+      payload: {
+        taskId,
+        onSuccess: () => onClose(),
+      },
     });
-
-    onClose();
   };
 
   return (
@@ -20,7 +22,11 @@ const DeleteTaskModal = ({ isOpen, onClose, taskId, taskName }) => {
       isOpen={isOpen}
       onClose={onClose}
       title="Delete Task"
-      primaryAction={{ label: "Yes, Delete", onClick: handleDelete }}
+      primaryAction={{
+        label: "Yes, Delete",
+        onClick: handleDelete,
+        loading: isLoading,
+      }}
       secondaryAction={{ label: "Cancel", onClick: onClose }}
     >
       <p className="text-gray-700">
