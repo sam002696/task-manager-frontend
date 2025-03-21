@@ -11,12 +11,14 @@ const SortingFilteringModal = ({ isOpen, onClose }) => {
   const filters = useSelector((state) => state.tasks.filters);
   const [localFilters, setLocalFilters] = useState(filters);
   const [prevFilters, setPrevFilters] = useState(filters);
+  const [errors, setErrors] = useState({});
 
-  // Update local filters when modal opens
+  // Updating local filters when modal opens
   useEffect(() => {
     if (isOpen) {
       setLocalFilters(filters);
-      setPrevFilters(filters); // Store previous filters
+      setPrevFilters(filters); // Storing previous filters
+      setErrors({});
     }
   }, [isOpen, filters]);
 
@@ -28,10 +30,26 @@ const SortingFilteringModal = ({ isOpen, onClose }) => {
       due_date_from: null,
       due_date_to: null,
     });
+    setErrors({});
   };
 
   const handleApply = () => {
-    // Check if any filter has changed
+    const { due_date_from, due_date_to } = localFilters;
+    const newErrors = {};
+
+    if (due_date_from && !due_date_to) {
+      newErrors.due_date_to = "Due date to needs to be selected";
+    }
+
+    if (due_date_to && !due_date_from) {
+      newErrors.due_date_from = "Due date from needs to be selected";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
     const filtersChanged =
       JSON.stringify(localFilters) !== JSON.stringify(prevFilters);
 
@@ -39,9 +57,9 @@ const SortingFilteringModal = ({ isOpen, onClose }) => {
       dispatch(setFilters(localFilters));
     }
 
-    // Close modal after applying filters
     onClose();
   };
+
   return (
     <Modal
       isOpen={isOpen}
@@ -92,20 +110,35 @@ const SortingFilteringModal = ({ isOpen, onClose }) => {
           label={"Due date from"}
           type="date"
           value={localFilters.due_date_from || ""}
-          onChange={(e) =>
-            setLocalFilters({ ...localFilters, due_date_from: e.target.value })
-          }
+          onChange={(e) => {
+            const value = e.target.value;
+            setLocalFilters({ ...localFilters, due_date_from: value });
+
+            if (value && errors.due_date_from) {
+              setErrors((prevErrors) => ({
+                ...prevErrors,
+                due_date_from: null,
+              }));
+            }
+          }}
           placeholder="Due Date From"
+          error={errors.due_date_from}
         />
 
         <Input
           label={"Due date to"}
           type="date"
           value={localFilters.due_date_to || ""}
-          onChange={(e) =>
-            setLocalFilters({ ...localFilters, due_date_to: e.target.value })
-          }
+          onChange={(e) => {
+            const value = e.target.value;
+            setLocalFilters({ ...localFilters, due_date_to: value });
+
+            if (value && errors.due_date_to) {
+              setErrors((prevErrors) => ({ ...prevErrors, due_date_to: null }));
+            }
+          }}
           placeholder="Due Date To"
+          error={errors.due_date_to}
         />
       </div>
     </Modal>
