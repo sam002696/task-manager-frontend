@@ -104,6 +104,9 @@ export const taskSlice = createSlice({
     setLoading: (state) => {
       state.loading = true;
     },
+    clearLoading: (state) => {
+      state.loading = false;
+    },
     // Reducer to set error state
     setError: (state, { payload }) => {
       state.error = payload;
@@ -141,6 +144,7 @@ export const taskSlice = createSlice({
         state.tasks = sortTasks(state.tasks, state.filters.sort);
         state.taskCounts = calculateTaskCounts(state.tasks);
       }
+      state.loading = false;
     },
 
     // Reducer to delete a task locally
@@ -165,6 +169,7 @@ export const {
   addTaskLocal,
   updateTaskLocal,
   deleteTaskLocal,
+  clearLoading,
   setFilters,
   setLoading,
   setError,

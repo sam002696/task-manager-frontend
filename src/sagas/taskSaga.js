@@ -1,5 +1,4 @@
 import { call, put, select, takeLatest, debounce } from "redux-saga/effects";
-import { succeed, failed } from "../store/apiSlice";
 import {
   setTasks,
   addTaskLocal,
@@ -8,70 +7,117 @@ import {
   setFilters,
   setError,
   setLoading,
+  clearLoading,
 } from "../store/taskSlice";
+import { succeed, failed } from "../store/apiSlice";
+import { setToastAlert } from "../store/errorSlice";
 import { TASK_API } from "../constants/apiConstants";
 import fetcher from "../api/fetcher";
-import { setToastAlert } from "../store/errorSlice";
 
-function* fetchTasks() {
+/**
+ * Generic saga handler to streamline API calls.
+ * Handles:
+ * - Loading state
+ * - API call execution
+ * - Success callback (optional)
+ * - Error handling and toasts
+ * - Rollback logic (optional)
+ */
+function* handleApiFlow({
+  apiCall,
+  onSuccess,
+  onError,
+  rollbackState,
+  output,
+}) {
   try {
+    // Starting loading indicator
     yield put(setLoading());
-    const filters = yield select((state) => state.tasks.filters); // Getting filters from Redux
 
-    let queryParams = new URLSearchParams();
+    // Executing the provided API call
+    const response = yield call(apiCall);
 
-    if (filters.status !== "All") queryParams.append("status", filters.status);
-    if (filters.sort === "newest") {
-      queryParams.append("sort", "desc");
-    } else if (filters.sort === "oldest") {
-      queryParams.append("sort", "asc");
+    // Checking for valid response structure
+    if (!response?.data && response?.status !== "success") {
+      throw new Error("Invalid API response.");
     }
 
-    if (filters.search) queryParams.append("search", filters.search);
+    // Executing optional success callback
+    if (onSuccess) yield call(onSuccess, response);
 
-    if (filters.due_date_from && filters.due_date_to) {
-      queryParams.append("due_date_from", filters.due_date_from);
-      queryParams.append("due_date_to", filters.due_date_to);
-    }
-
-    const response = yield call(() =>
-      fetcher(`${TASK_API.FETCH}?${queryParams}`)
-    );
-
-    if (response?.data) {
-      yield put(setTasks(response.data));
-    }
-
-    yield put(succeed({ response, output: "taskLists" }));
+    // Dispatching success tracking
+    yield put(succeed({ response, output }));
   } catch (error) {
-    yield put(failed({ error: error.message }));
-    yield put(setError(error.message));
+    // Extract meaningful error message
+    const errorMessage =
+      error?.response?.message || error.message || "Something went wrong";
+
+    // Updating error state and show user-friendly alert
+    yield put(setError(errorMessage));
+    yield put(failed({ error: errorMessage }));
+    yield put(setToastAlert({ type: "error", message: errorMessage }));
+
+    // Executing optional rollback logic
+    if (rollbackState) yield put(rollbackState());
+    // Executing optional error callback
+    if (onError) yield call(onError, errorMessage);
+  } finally {
+    // Clearing loading indicator
+    yield put(clearLoading());
   }
 }
 
-function* addTask(action) {
-  try {
-    const { taskData, onSuccess } = action.payload;
+/**
+ * Fetching all tasks based on current filters from Redux.
+ * Filters may include: status, sort order, search, and due date range.
+ */
+function* fetchTasks() {
+  yield call(handleApiFlow, {
+    apiCall: function* () {
+      const filters = yield select((state) => state.tasks.filters);
+      const queryParams = new URLSearchParams();
 
-    yield put(setLoading());
+      if (filters.status !== "All")
+        queryParams.append("status", filters.status);
+      if (filters.sort === "newest") queryParams.append("sort", "desc");
+      else if (filters.sort === "oldest") queryParams.append("sort", "asc");
+      if (filters.search) queryParams.append("search", filters.search);
+      if (filters.due_date_from && filters.due_date_to) {
+        queryParams.append("due_date_from", filters.due_date_from);
+        queryParams.append("due_date_to", filters.due_date_to);
+      }
 
-    const response = yield call(() =>
+      // Fetching tasks based on the query parameters
+      return yield call(() => fetcher(`${TASK_API.FETCH}?${queryParams}`));
+    },
+    onSuccess: function* (response) {
+      // Updating the tasks state with the fetched tasks
+      yield put(setTasks(response.data));
+    },
+    output: "taskLists",
+  });
+}
+
+/**
+ * Adding a new task (with optimistic UI update).
+ */
+function* addTask({ payload }) {
+  // Destructuring the payload
+  const { taskData, onSuccess } = payload;
+
+  yield call(handleApiFlow, {
+    // API call to create a new task
+    apiCall: () =>
       fetcher(TASK_API.CREATE, {
         method: "POST",
         body: JSON.stringify(taskData),
-      })
-    );
+      }),
+    // Success callback to update the tasks state
+    onSuccess: function* (response) {
+      const tasks = yield select((state) => state.tasks.tasks);
+      const exists = tasks.some((task) => task.id === response.data.id);
+      if (!exists) yield put(addTaskLocal(response.data));
 
-    if (response?.data) {
-      const existingTasks = yield select((state) => state.tasks.tasks);
-      const exists = existingTasks.some((task) => task.id === response.data.id);
-
-      if (!exists) {
-        // optimistically updating the UI
-        yield put(addTaskLocal(response.data));
-      }
-
-      //  Ensuring Success Before Proceeding
       yield put(
         setToastAlert({
           type: "success",
@@ -80,122 +126,92 @@ function* addTask(action) {
       );
 
       if (onSuccess) onSuccess();
-
-      //  Fetching Latest Data
-      yield put({ type: TASK_API.FETCH });
-
-      //  Confirm Success Before Exiting
-      yield put(succeed({ response, output: TASK_API.CREATE }));
-      return;
-    }
-
-    throw new Error("Invalid API response. Task data is missing.");
-  } catch (error) {
-    const errorMessage = error?.response?.message;
-    yield put(setError(errorMessage));
-    yield put(failed({ error: errorMessage }));
-    yield put(
-      setToastAlert({
-        type: "error",
-        message: errorMessage || " Something went wrong",
-      })
-    );
-  }
+      yield put({ type: "taskLists" }); // Fetch tasks to update the list
+    },
+    output: "taskAdd",
+  });
 }
 
-function* updateTask(action) {
-  let previousTasks = [];
+/**
+ * Updating an existing task (with optimistic UI update and rollback).
+ * If the API call fails, we restore the previous state.
+ */
+function* updateTask({ payload }) {
+  const { taskId, taskData } = payload;
 
-  try {
-    const { taskId, taskData } = action.payload;
+  // Backing up current state for rollback
+  const previousState = yield select((state) => state.tasks.tasks);
 
-    previousTasks = yield select((state) => state.tasks.tasks); //  Save old state
+  // Optimistic update
+  yield put(updateTaskLocal({ id: taskId, ...taskData })); // Optimistic update
 
-    // Optimistically updating UI
-    yield put(updateTaskLocal({ id: taskId, ...taskData }));
-
-    //  Ensuring function is called with `taskId`
-    const response = yield call(() =>
+  // API call to update the task
+  yield call(handleApiFlow, {
+    apiCall: () =>
       fetcher(TASK_API.UPDATE(taskId), {
         method: "PUT",
         body: JSON.stringify(taskData),
-      })
-    );
-
-    if (!response?.data) {
-      throw new Error("Invalid API response.");
-    }
-
-    yield put(succeed({ response, output: TASK_API.UPDATE(taskId) }));
-    yield put(
-      setToastAlert({ type: "success", message: "Task updated successfully!" })
-    );
-  } catch (error) {
-    const errorMessage = error?.response?.message;
-    yield put(failed({ error: errorMessage }));
-
-    if (previousTasks.length > 0) {
-      yield put(setTasks(previousTasks));
-    }
-
-    yield put(setToastAlert({ type: "error", message: errorMessage }));
-  }
+      }),
+    onSuccess: function* (response) {
+      yield put(
+        setToastAlert({
+          type: "success",
+          message: response?.message || "Task updated successfully!",
+        })
+      );
+    },
+    rollbackState: () => setTasks(previousState),
+    output: "updateTask",
+  });
 }
 
-function* deleteTask(action) {
-  let previousTasks = [];
+/**
+ * Delete a task (with optimistic UI update and rollback).
+ * Removes task from UI immediately, and rolls back if API fails.
+ */
+function* deleteTask({ payload }) {
+  const { taskId, onSuccess } = payload;
 
-  try {
-    const { taskId, onSuccess } = action.payload;
+  // Saving current state for rollback
+  const previousTasks = yield select((state) => state.tasks.tasks);
 
-    yield put(setLoading());
+  yield put(deleteTaskLocal(taskId)); // Optimistic delete
 
-    // Save previous state for rollback in case of failure
-    previousTasks = yield select((state) => state.tasks.tasks);
-
-    // Optimistically remove task from UI
-    yield put(deleteTaskLocal(taskId));
-
-    // Call API to delete task
-    const response = yield call(() =>
+  // API call to delete the task
+  yield call(handleApiFlow, {
+    apiCall: () =>
       fetcher(TASK_API.DELETE(taskId), {
         method: "DELETE",
-      })
-    );
-
-    if (response?.status === "success") {
-      yield put(succeed({ output: TASK_API.DELETE(taskId) }));
+      }),
+    onSuccess: function* (response) {
       yield put(setToastAlert({ type: "success", message: response?.message }));
-
       if (onSuccess) onSuccess();
-    }
-  } catch (error) {
-    const errorMessage = error?.response?.message;
-    yield put(setError(errorMessage));
-    yield put(failed({ error: errorMessage }));
-
-    // Rollback UI update in case of failure
-    if (previousTasks.length > 0) {
-      yield put(setTasks(previousTasks));
-    }
-
-    yield put(setToastAlert({ type: "error", message: errorMessage }));
-  }
+    },
+    rollbackState: () => setTasks(previousTasks),
+    output: "deleteTask",
+  });
 }
 
-// Debounced Search
-function* handleSearchTasks(action) {
-  const currentFilters = yield select((state) => state.tasks.filters);
+/**
+ * Handle debounced search input for filtering tasks.
+ * Waits for 500ms after the last keystroke before triggering fetch.
+ */
+function* handleSearchTasks({ payload }) {
+  const filters = yield select((state) => state.tasks.filters);
 
-  yield put(setFilters({ ...currentFilters, search: action.payload }));
+  // Updating the search filter and fetching tasks
+  yield put(setFilters({ ...filters, search: payload }));
   yield call(fetchTasks);
 }
 
-//  Saga Watcher
+/**
+ * Root task saga watcher.
+ * Maps action types to saga handlers.
+ */
 export default function* taskSaga() {
   yield takeLatest("taskLists", fetchTasks);
   yield takeLatest("taskAdd", addTask);
   yield takeLatest("updateTask", updateTask);
   yield takeLatest("deleteTask", deleteTask);
-  yield debounce(500, "searchTasks", handleSearchTasks);
+  yield debounce(500, "searchTasks", handleSearchTasks); // Debounced search
 }

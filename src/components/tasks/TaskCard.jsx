@@ -163,7 +163,7 @@ const TaskCard = ({ id, name, description, status, dueDate, createdAt }) => {
       <div className="">
         {/* Task created date */}
 
-        <div className="inline-flex items-center gap-x-0.5 rounded-md bg-stone-100 px-2 py-1 text-xs font-medium text-stone-600 mb-2">
+        <div className="inline-flex items-center gap-x-0.5 rounded-md bg-teal-100 px-2 py-1 text-xs font-medium text-teal-600 mb-2">
           <div className="group relative -ml-1 size-3.5 rounded-xs hover:bg-gray-500/20">
             <span className="sr-only">Remove</span>
             <CalendarIcon className="size-3.5" />
@@ -174,7 +174,7 @@ const TaskCard = ({ id, name, description, status, dueDate, createdAt }) => {
 
         {/* Task due date */}
 
-        <div className="inline-flex items-center gap-x-0.5 rounded-md bg-red-100 px-2 py-1 text-xs font-medium text-red-600 mb-2">
+        <div className="inline-flex items-center gap-x-0.5 rounded-md bg-purple-100 px-2 py-1 text-xs font-medium text-purple-600 mb-2">
           <div className="group relative -ml-1 size-3.5 rounded-xs hover:bg-gray-500/20">
             <span className="sr-only">Remove</span>
             <CalendarDaysIcon className="size-3.5" />
