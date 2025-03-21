@@ -75,11 +75,12 @@ const MainContent = () => {
             <Button
               type="button"
               onClick={() => setIsFilterModalOpen(true)}
-              variant="filter"
+              variant="yellowFilter"
               icon={FunnelIcon}
               iconPosition="left"
             >
-              Sorting & Filtering ({activeFilterCount})
+              Sorting & Filtering ({" "}
+              <span className="text-yellow-700">{activeFilterCount}</span> )
             </Button>
           </div>
 

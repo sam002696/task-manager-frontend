@@ -25,6 +25,8 @@ const Button = ({
       "bg-red-500 text-white hover:bg-red-600 focus-visible:outline-red-700",
     filter:
       "bg-indigo-50 text-indigo-600 hover:bg-indigo-100 focus-visible:outline-indigo-600",
+    yellowFilter:
+      "bg-yellow-200 text-yellow-600 hover:bg-yellow-300 focus-visible:outline-yellow-600",
   };
 
   return (
