@@ -13,6 +13,7 @@ import { succeed, failed } from "../store/apiSlice";
 import { setToastAlert } from "../store/errorSlice";
 import { TASK_API } from "../constants/apiConstants";
 import fetcher from "../api/fetcher";
+import { AuthUser } from "../helpers/AuthUser";
 
 /**
  * Generic saga handler to streamline API calls.
@@ -51,6 +52,10 @@ function* handleApiFlow({
     // Extract meaningful error message
     const errorMessage =
       error?.response?.message || error.message || "Something went wrong";
+
+    if (errorMessage == "Invalid or missing authentication token") {
+      AuthUser.logout();
+    }
 
     // Updating error state and show user-friendly alert
     yield put(setError(errorMessage));

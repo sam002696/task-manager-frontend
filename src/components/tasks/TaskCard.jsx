@@ -263,7 +263,7 @@ const TaskCard = ({ id, name, description, status, dueDate, createdAt }) => {
         {/* Menu Button for Actions (Top-Right) */}
         <div>
           <Menu as="div" className="relative inline-block text-left">
-            <MenuButton className="flex items-center rounded-full p-2 text-gray-400 hover:text-gray-600 cursor-pointer">
+            <MenuButton className="flex items-center rounded-full  text-gray-400 hover:text-gray-600 cursor-pointer">
               <EllipsisVerticalIcon className="h-5 w-5" />
             </MenuButton>
 
@@ -286,7 +286,7 @@ const TaskCard = ({ id, name, description, status, dueDate, createdAt }) => {
 
         {/* Drag Handle (Bottom-Right) */}
         {!isAnyFieldEditing && (
-          <div className="mt-auto">
+          <div className="mt-auto mx-auto">
             <div
               {...listeners}
               {...attributes}
