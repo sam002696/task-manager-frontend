@@ -18,6 +18,13 @@ class AuthUserHelper {
       sameSite: "Strict",
     });
 
+    // for live settings
+    // Cookies.set("access_token", token, {
+    //   expires: 5, // 5 days
+    //   secure: false,
+    //   sameSite: "Lax",
+    // });
+
     // Setting user data in local storage
     localStorage.setItem("auth_user", JSON.stringify(user));
   }
